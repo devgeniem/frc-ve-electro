@@ -27,49 +27,102 @@ class ComponentCollection extends PayloadCollection
         return $this->$key();
     }
 
-    public function current()
+    protected function filterByDate($date)
     {
-        $now = Carbon::now();
 
-        return $this->filter(function($value) use($now) {
-
+        $items =  $this->filter(function($value) use($date) {
             $from = Carbon::parse($value['valid_from']);
             $to = Carbon::parse($value['valid_to']);
 
-            return $now->greaterThanOrEqualTo($from) && $now->lessThan($to);
+            return $date->greaterThanOrEqualTo($from) && $date->lessThan($to);
         });
+
+        return $items;
+    }
+
+    public function current()
+    {
+        return $this->filterByDate(Carbon::now());
+    }
+
+    public function primary()
+    {
+        return $this->active();
+    }
+
+    public function secondary()
+    {
+        $primary = $this->primary();
+
+        $now = Carbon::now();
+
+        $next = $primary->first()->get('valid_to')->subMonth()->startOfMonth();
+        $prev = $primary->first()->get('valid_from')->addMonths(2)->endOfMonth();
+
+        if ( $now->greaterThanOrEqualTo($next) ) {
+            return $this->next($primary);
+        }
+
+        if ( $now->lessThan($prev) ) {
+            return $this->prev($primary);
+        }
+
     }
 
     public function active()
     {
         // @TODO: Get period of relevant to user.
         // E.g. show next period already 14 days before valid_from date.
-        return $this;
+        $next = Carbon::now()->addDays(14);
+        return $this->filterByDate($next);
     }
 
     public function prevOrNext()
     {
         // @TODO: Figure which side of current's period should be shown
+
         return $this;
     }
 
-    public function next()
+    public function next($by = null)
     {
-        $currentEnd = $this->current()->first()->get('valid_to');
+        if (! $by ) {
+            $by = $this->current()->first();
+        } else {
+            $by = $by->first();
+        }
 
-        return $this->filter(function($value) use($currentEnd) {
+        if (! $by) {
+            return $this;
+        }
+
+        $by = $by->get('valid_to');
+
+        return $this->filter(function($value) use($by) {
             $from = Carbon::parse($value['valid_from']);
-            return $from->greaterThanOrEqualTo($currentEnd);
+            return $from->isSameDay($by);
         });
     }
 
-    public function prev()
+    public function prev($by = null)
     {
-        $currentFrom = $this->current()->first()->get('valid_from');
+        if (! $by ) {
+            $by = $this->current()->first();
+        } else {
+            $by = $by->first();
+        }
 
-        return $this->filter(function($value) use($currentFrom) {
+        if (! $by) {
+            return $this;
+        }
+
+        $by = $by->get('valid_from');
+
+
+
+        return $this->filter(function($value) use($by) {
             $to = Carbon::parse($value['valid_to']);
-            return $to->lessThan($currentFrom);
+            return $to->isSameDay($by);
         });
     }
 }

@@ -202,9 +202,4 @@ class Standard
     {
         return (bool) $this->payload->get('product_account_group', 0) == 59001;
     }
-
-    public function shouldDisplayPeriod()
-    {
-        return $this->payload->get('protection_method') === 'Puolivuotistuote';
-    }
 }

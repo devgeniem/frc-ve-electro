@@ -2,6 +2,8 @@
 
 namespace VE\Electro\Product;
 
+use Carbon\Carbon;
+
 use VE\Electro\Electro;
 
 class Component extends PayloadCollection
@@ -48,4 +50,36 @@ class Component extends PayloadCollection
 
         return new Price($args);
     }
+
+
+    public function isCurrent()
+    {
+        $now = Carbon::now();
+        $from = $this->get('valid_from');
+        $to = $this->get('valid_to');
+        return $now->greaterThanOrEqualTo($from) && $now->lessThan($to);
+    }
+
+    public function isActive()
+    {
+        $now = Carbon::now();
+        $from = $this->get('valid_from')->subDays(14);
+        $to = $this->get('valid_to');
+        return $now->greaterThanOrEqualTo($from) && $now->lessThan($to);
+    }
+
+    public function isPrev()
+    {
+        $now = Carbon::now();
+        $to = $this->get('valid_to');
+        return $now->greaterThanOrEqualTo($to);
+    }
+
+    public function isNext()
+    {
+        $now = Carbon::now();
+        $from = $this->get('valid_from');
+        return $from->greaterThanOrEqualTo($now);
+    }
+
 }

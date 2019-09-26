@@ -20,7 +20,6 @@ class PayloadCollection extends BaseCollection
         // Cast dates to Carbon object
         if ( in_array($key, $this->dates) ) {
             return Carbon::create($value)
-                ->setTimezone('Europe/Helsinki')
                 ->settings([
                     'toStringFormat' => 'j.n.Y',
                 ]);

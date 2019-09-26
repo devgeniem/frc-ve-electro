@@ -17,8 +17,7 @@ class Temporary extends Standard
             $from = Carbon::parse($item['valid_from'])
                 ->startOfMonth()
                 ->addMonths(6)
-                ->endOfMonth()
-                ->startOfDay();
+                ->endOfMonth();
 
             $item['valid_to'] = $from->toString();
             return $item;
@@ -29,10 +28,52 @@ class Temporary extends Standard
 
     public function periods()
     {
-        return [
-            'current',
-            'next',
-        ];
+        if ( $this->components()->secondary() ) {
+            return [
+                'primary',
+                'secondary',
+            ];
+        }
+        return ['primary'];
+    }
+
+    public function shouldDisplayPrev()
+    {
+        $now = Carbon::now();
+        $current = $this->components()->current()->first();
+
+        if (! $current) {
+            return false;
+        }
+
+        $current = $current->get('valid_from')->addMonths(2);
+        return $now->lessThan($current);
+    }
+
+    public function shouldDisplayCurrent()
+    {
+        $now = Carbon::now();
+        $current = $this->components()->current()->first();
+
+        if (! $current) {
+            return false;
+        }
+
+        $current = $current->get('valid_to')->subDays(14);
+        return $now->greaterThanOrEqualTo($current);
+    }
+
+    public function shouldDisplayNext()
+    {
+        $now = Carbon::now();
+        $current = $this->components()->current()->first();
+
+        if (! $current) {
+            return false;
+        }
+
+        $current = $current->get('valid_to')->subMonths(1);
+        return $now->greaterThanOrEqualTo($current) && ! $this->shouldDisplayCurrent();
     }
 
     public function togglePeriod($active)
@@ -44,5 +85,10 @@ class Temporary extends Standard
         $items = reset($items);
 
         return $items;
+    }
+
+    public function shouldDisplayPeriod()
+    {
+        return $this->payload->get('protection_method') === 'Puolivuotistuote';
     }
 }
