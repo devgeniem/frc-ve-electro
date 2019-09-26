@@ -1,0 +1,25 @@
+{
+    "name": "frc/ve-electro",
+    "type": "wordpress-plugin",
+    "description": "EnerimCIS Product integration for WordPress",
+    "homepage": "https://www.frantic.com/",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Janne Aalto",
+            "email": "janne.aalto@frantic.com"
+        },
+        {
+            "name": "Joonas Meriläinen",
+            "email": "joonas.merilainen@frantic.com"
+        }
+    ],
+    "keywords": [
+        "wordpress"
+    ],
+    "require": {
+        "php": ">=7.3",
+        "composer/installers": "~1.0",
+        "nesbot/carbon": "^2.24"
+    }
+}
