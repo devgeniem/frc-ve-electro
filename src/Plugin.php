@@ -3,6 +3,7 @@
 namespace VE\Electro;
 
 use VE\Electro\Support\Str;
+use Carbon\Carbon;
 
 class Plugin
 {
@@ -10,6 +11,10 @@ class Plugin
 
     public static function boot()
     {
+        Carbon::setTestNow(
+            Carbon::create('2019-12-01')
+        );
+
         static::load();
         Admin\Admin::load();
     }
