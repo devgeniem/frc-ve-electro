@@ -56,7 +56,7 @@ class ComponentCollection extends PayloadCollection
 
         $now = Carbon::now();
 
-        $next = $primary->first()->get('valid_to')->subMonth()->startOfMonth();
+        $next = $primary->first()->get('valid_to')->subMonths(6)->startOfMonth();
         $prev = $primary->first()->get('valid_from')->addMonths(2)->endOfMonth();
 
         if ( $now->greaterThanOrEqualTo($next) ) {

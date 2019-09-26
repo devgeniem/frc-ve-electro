@@ -11,9 +11,6 @@ class Plugin
 
     public static function boot()
     {
-        Carbon::setTestNow(
-            Carbon::create('2019-12-01')
-        );
 
         static::load();
         Admin\Admin::load();
