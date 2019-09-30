@@ -19,9 +19,22 @@ class Plugin
     public static function load()
     {
         add_action('init', [__CLASS__, 'actions_init']);
+        
         add_action('cli_init', [__CLASS__, 'cli_init']);
 
         add_action('init', [__CLASS__, 'models_init']);
+        add_action('acf/init', [__CLASS__, 'acf_init']);
+    }
+
+    public static function acf_init()
+    {
+        $fields = [
+            Admin\Acf\ProductGroupFields::class,
+        ];
+
+        foreach($fields as $field) {
+            (new $field)->register();
+        }
     }
 
     public static function models_init()
