@@ -17,6 +17,10 @@ class ProductRepository
             return new Variations\Temporary($object->payload);
         }
 
+        if ( $object->payload->get('pricing_method') === Code::TYPE_SPOT ) {
+            return new Variations\Spot($object->payload);
+        }
+
         return new Variations\Standard($object->payload);
     }
 
