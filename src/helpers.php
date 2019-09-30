@@ -75,3 +75,8 @@ if (! function_exists('value')) {
         return $value instanceof Closure ? $value() : $value;
     }
 }
+
+function get_product_group($id)
+{
+    return VE\Electro\ProductGroup\ProductGroupRepository::get($id);
+}
