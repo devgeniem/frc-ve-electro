@@ -10,12 +10,21 @@ use VE\Electro\Product\ComponentCollection;
 class Standard
 {
     protected $payload;
+    public $components;
 
     protected $componentsMutated;
+    protected $filters = [];
 
-    public function __construct($payload)
+    public function __construct($model)
     {
-        $this->payload = (new PayloadCollection($payload))->recursive();
+        $this->payload = (new PayloadCollection($model->payload))->recursive();
+        $this->components = $model->components;
+    }
+
+    public function filter(array $args = [])
+    {
+        $this->filters = $args;
+        return $this;
     }
 
     public function getType()
