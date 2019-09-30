@@ -43,8 +43,20 @@ class Products extends Action
                 ],
             ]);
         }
-
         // @TODO: Add support for single product imports
+    }
+
+    public function import(array $response = [])
+    {
+        foreach($response as $payload) {
+            $id = Product::updateOrCreate([
+                'post_title' => $payload['product_name'],
+                'post_status' => 'publish',
+                'meta_input' => [
+                    'payload' => $payload,
+                ],
+            ]);
+        }
     }
 
     public function purge()
