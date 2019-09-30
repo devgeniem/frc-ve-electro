@@ -75,11 +75,11 @@ class ProductGroup
     }
 
     public function present() {
-        return new Presenters\ProductGroup($this);
+        return new Presenters\ProductGroupPresenter($this);
     }
 
     public function __get($property)
-    {   
+    {
         if ($this->model->meta->$property) {
             return $this->model->meta->$property;
         }
