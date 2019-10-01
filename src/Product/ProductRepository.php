@@ -10,18 +10,18 @@ class ProductRepository
     public static function factory($model)
     {
         if ( $model->payload->get('product_group') === Code::GROUP_PACKAGE ) {
-            return new Variations\Package($model->payload);
+            return new Variations\Package($model);
         }
 
         if ( $model->payload->get('protection_method') === Code::TYPE_TEMPORARY ) {
             return new Variations\Temporary($model);
         }
 
-        if ( $model->payload->get('pricing_method') === Code::TYPE_SPOT ) {
-            return new Variations\Spot($model->payload);
+        if ( $model->payload->get('protection_method') === Code::TYPE_SPOT ) {
+            return new Variations\Spot($model);
         }
 
-        return new Variations\Standard($model->payload);
+        return new Variations\Standard($model);
     }
 
     public static function get(int $id)
