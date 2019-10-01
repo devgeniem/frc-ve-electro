@@ -9,12 +9,23 @@ abstract class Presenter {
     */
     protected $entity;
 
+    protected $hash;
+
     /**
     * @param $entity
     */
     function __construct($entity)
     {
         $this->entity = $entity;
+    }
+
+    public function hash()
+    {
+        if (! $this->hash) {
+            $this->hash = uniqid();
+        }
+
+        return $this->hash;
     }
 
     /**
