@@ -9,11 +9,23 @@ class Spot extends Standard
         return 'spot';
     }
 
+    public function components()
+    {
+        return $this->components
+            ->period('active')
+            ->filter(function($item) {
+                return (
+                    $item['unit_price'] != 0 &&
+                    $item['price_valid_period'] == 0
+                );
+            });
+    }
+
     protected function mutateComponents($items)
     {
         return $items->filter(function($item) {
             return (
-                $item['unit_price'] != 0 && 
+                $item['unit_price'] != 0 &&
                 $item['price_valid_period'] == 0
             );
         });

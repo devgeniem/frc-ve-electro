@@ -183,4 +183,11 @@ class Standard
     {
         return (bool) $this->payload->get('product_account_group', 0) == 59001;
     }
+
+    public function getMeta()
+    {
+        return [
+            'contract_duration',
+        ];
+    }
 }
