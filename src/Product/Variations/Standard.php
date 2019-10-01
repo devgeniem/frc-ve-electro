@@ -9,6 +9,8 @@ use VE\Electro\Product\ComponentCollection;
 
 class Standard
 {
+    public const TYPE = 'standard';
+
     protected $payload;
     public $components;
 
@@ -29,7 +31,7 @@ class Standard
 
     public function getType()
     {
-        return 'standard';
+        return static::TYPE;
     }
 
     public function isType($key)
@@ -51,37 +53,7 @@ class Standard
      */
     public function components()
     {
-        if ($this->componentsMutated) {
-            return $this->componentsMutated;
-        }
-
-        $prices = $this->payload
-            ->get('product_components', collect([]))
-            ->map(function($component) {
-                // Merge component_prices and single product_components item
-                // to get flat data model for product_components
-                $merged = $component
-                    ->get('component_prices')
-                    ->map(function($price) use($component) {
-                        return $price
-                            ->merge($component)
-                            ->forget('component_prices');
-                    });
-
-                // Replace component_prices with merged data
-                $component->put('component_prices', $merged);
-
-                return $component;
-            })
-            ->pluck('component_prices')
-            ->collapse()
-            ->sortBy('sort_order');
-
-        $prices = $this->mutateComponents($prices);
-
-        // Map component_prices items to be Component objects
-        return $this->componentsMutated =
-            (new ComponentCollection($prices))->mapInto(Component::class);
+        return $this->components->period('active');
     }
 
     protected function mutateComponents($items)

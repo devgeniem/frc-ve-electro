@@ -2,18 +2,26 @@
 
 namespace VE\Electro\Presenters;
 
+use VE\Electro\Support\Str;
+
 class ProductPresenter extends Presenter
 {
     public function title()
     {
-        return $this->entity->getMeasurementMethodName();
+        $title = $this->entity->getMeasurementMethodName();
+        return Str::ucfirst($title);
+    }
+
+    public function name()
+    {
+        return $this->entity->getProductName();
     }
 
     public function components()
     {
         return (object) [
-            'primary' => $this->entity->components,
-            'secondary' => $this->entity->components,
+            'primary' => $this->entity->components()->type('primary'),
+            'secondary' => $this->entity->components()->type('secondary'),
         ];
     }
 }
