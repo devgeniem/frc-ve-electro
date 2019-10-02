@@ -16,4 +16,18 @@ class ProductGroupPresenter extends Presenter
     {
         return $this->entity->periods();
     }
+
+    protected function hasRelatedPeriodGroup()
+    {
+        $period = $this->entity->getRelatedPeriodGroup();
+        if (! $period) {
+            return;
+        }
+        return (bool) $period->products->first()->components();
+    }
+
+    protected function relatedPeriodGroup()
+    {
+        return $this->entity->getRelatedPeriodGroup();
+    }
 }

@@ -12,7 +12,7 @@ class Spot extends Standard
     public function components()
     {
         return $this->components
-            ->period('active')
+            ->period($this->getFilter('period'))
             ->filter(function($item) {
                 return (
                     $item['unit_price'] != 0 &&

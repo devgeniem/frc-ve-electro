@@ -9,7 +9,7 @@ class ProductGroup
 {
     // public $products;
     protected $model;
-    public $args;
+    protected $args;
 
     public function __construct($model, array $args = [])
     {
@@ -33,11 +33,9 @@ class ProductGroup
 
     }
 
-    public function period($period = 'primary')
+    public function args($key)
     {
-        return new static($this->model, [
-            'period' => $period,
-        ]);
+        return $this->args[$key] ?? null;
     }
 
     public function getType()
@@ -50,14 +48,12 @@ class ProductGroup
         return $this->getType() == $type;
     }
 
-    public function getRelatedGroup()
+    public function getRelatedPeriodGroup()
     {
-        if ($this->isType('temporary')) {
-            $period = $this->args['period'] == 'primary' ? 'secondary' : 'primary';
-            $group = new static($this->model, [
-                'period' => $period,
+        if ( $this->isType('temporary') && $this->args('period') == 'primary' ) {
+            return new static($this->model, [
+                'period' => 'secondary',
             ]);
-            // var_dump($group->products);
         }
     }
 

@@ -13,8 +13,15 @@ class Temporary extends Standard
 
     public function components()
     {
-        return $this->components->period('active')
-            ->map(function($item) {
+        
+        $items = $this->components
+            ->period($this->getFilter('period'));
+        
+        if (! $items ) {
+            return;
+        }
+
+        return $items->map(function($item) {
                 $from = Carbon::parse($item['valid_from'])
                     ->startOfMonth()
                     ->addMonths(6)
@@ -27,7 +34,7 @@ class Temporary extends Standard
 
     public function periods()
     {
-        if ( $this->components()->period('secondary') ) {
+        if ( $this->components->period('secondary') ) {
             return [
                 'primary',
                 'secondary',

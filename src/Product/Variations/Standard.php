@@ -21,12 +21,22 @@ class Standard
     {
         $this->payload = (new PayloadCollection($model->payload))->recursive();
         $this->components = $model->components;
+
+        $defaults = [
+            'period' => 'primary',
+        ];
+        $this->filters = wp_parse_args([], $defaults);
     }
 
     public function filter(array $args = [])
     {
-        $this->filters = $args;
+        $defaults = $this->filters;
+        $this->filters = wp_parse_args($args, $defaults);
         return $this;
+    }
+
+    public function getFilter($key) {
+        return $this->filters[$key] ?? null;
     }
 
     public function getType()
@@ -53,7 +63,8 @@ class Standard
      */
     public function components()
     {
-        return $this->components->period('active');
+        return $this->components
+            ->period($this->getFilter('period'));
     }
 
     protected function mutateComponents($items)
