@@ -190,4 +190,9 @@ class Standard
             'contract_duration',
         ];
     }
+
+    public function hasComponents()
+    {
+        return (bool) $this->components();
+    }
 }

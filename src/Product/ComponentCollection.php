@@ -52,14 +52,14 @@ class ComponentCollection extends PayloadCollection
         return $this->filterByDate(Carbon::now());
     }
 
-    public function primary()
+    public function periodPrimary()
     {
-        return $this->active();
+        return $this->periodActive();
     }
 
-    public function secondary()
+    public function periodSecondary()
     {
-        $primary = $this->primary();
+        $primary = $this->periodPrimary();
 
         $now = Carbon::now();
 
@@ -67,11 +67,11 @@ class ComponentCollection extends PayloadCollection
         $prev = $primary->first()->get('valid_from')->addMonths(2)->endOfMonth();
 
         if ( $now->greaterThanOrEqualTo($next) ) {
-            return $this->next($primary);
+            return $this->periodNext($primary);
         }
 
         if ( $now->lessThan($prev) ) {
-            return $this->prev($primary);
+            return $this->periodPrev($primary);
         }
 
     }
@@ -91,10 +91,10 @@ class ComponentCollection extends PayloadCollection
         return $this;
     }
 
-    public function next($by = null)
+    public function periodNext($by = null)
     {
         if (! $by ) {
-            $by = $this->current()->first();
+            $by = $this->periodCurrent()->first();
         } else {
             $by = $by->first();
         }
@@ -111,10 +111,10 @@ class ComponentCollection extends PayloadCollection
         });
     }
 
-    public function prev($by = null)
+    public function periodPrev($by = null)
     {
         if (! $by ) {
-            $by = $this->current()->first();
+            $by = $this->periodCurrent()->first();
         } else {
             $by = $by->first();
         }

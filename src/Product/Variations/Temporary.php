@@ -27,7 +27,7 @@ class Temporary extends Standard
 
     public function periods()
     {
-        if ( $this->components()->secondary() ) {
+        if ( $this->components()->period('secondary') ) {
             return [
                 'primary',
                 'secondary',

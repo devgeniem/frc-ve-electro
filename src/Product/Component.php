@@ -5,7 +5,7 @@ namespace VE\Electro\Product;
 use Carbon\Carbon;
 
 use VE\Electro\Electro;
-
+use VE\Electro\Presenters\ProductComponentPresenter;
 class Component extends PayloadCollection
 {
     public function getName()
@@ -80,6 +80,11 @@ class Component extends PayloadCollection
         $now = Carbon::now();
         $from = $this->get('valid_from');
         return $from->greaterThanOrEqualTo($now);
+    }
+
+    public function present()
+    {
+        return new ProductComponentPresenter($this);
     }
 
 }

@@ -71,7 +71,12 @@ class ProductGroup
 
     public function periods()
     {
-        return $this->model->products->first()->periods();
+        $periods = $this->model->products->first()->periods();
+        return array_map(function($period) {
+            return new static($this->model, [
+                'period' => $period,
+            ]);
+        }, $periods);
     }
 
     public function present() {

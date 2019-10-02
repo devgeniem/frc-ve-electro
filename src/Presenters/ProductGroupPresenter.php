@@ -11,4 +11,9 @@ class ProductGroupPresenter extends Presenter
             return new ProductPresenter($entity);
         });
     }
+
+    protected function periods()
+    {
+        return $this->entity->periods();
+    }
 }

@@ -12,6 +12,11 @@ class ProductPresenter extends Presenter
         return Str::ucfirst($title);
     }
 
+    public function subtitle()
+    {
+        return $this->name;
+    }
+
     public function name()
     {
         return $this->entity->getProductName();
@@ -51,7 +56,17 @@ class ProductPresenter extends Presenter
         return $this->entity->getOrderLink();
     }
 
+    public function order_text()
+    {
+        return 'Tilaa';
+    }
+
     public function isType($type) {
         return $this->entity->isType($type);
+    }
+
+    public function hasComponents()
+    {
+        return (bool) $this->entity->components();
     }
 }
