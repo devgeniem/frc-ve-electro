@@ -22,7 +22,7 @@ class Code
 
     public const GROUP_PACKAGE = 'Pakettisähkö';
     public const TYPE_TEMPORARY = 'Puolivuotistuote';
-    public const TYPE_SPOT = 'Pörssisähkö';
+    public const TYPE_SPOT = 'Spot';
 
     protected static $values = [
         // Currency

@@ -7,21 +7,21 @@ use VE\Electro\Models\Product;
 
 class ProductRepository
 {
-    public static function factory($object)
+    public static function factory($model)
     {
-        if ( $object->payload->get('product_group') === Code::GROUP_PACKAGE ) {
-            return new Variations\Package($object->payload);
+        if ( $model->payload->get('product_group') === Code::GROUP_PACKAGE ) {
+            return new Variations\Package($model);
         }
 
-        if ( $object->payload->get('protection_method') === Code::TYPE_TEMPORARY ) {
-            return new Variations\Temporary($object->payload);
+        if ( $model->payload->get('protection_method') === Code::TYPE_TEMPORARY ) {
+            return new Variations\Temporary($model);
         }
 
-        if ( $object->payload->get('pricing_method') === Code::TYPE_SPOT ) {
-            return new Variations\Spot($object->payload);
+        if ( $model->payload->get('protection_method') === Code::TYPE_SPOT ) {
+            return new Variations\Spot($model);
         }
 
-        return new Variations\Standard($object->payload);
+        return new Variations\Standard($model);
     }
 
     public static function get(int $id)

@@ -29,8 +29,8 @@ $product = ProductRepository::get($post->ID);
 
 <?php
 $components = $product->components()
-    ->items()
-    ->current()
+    ->type('primary')
+    ->period('current')
 ?>
 <div style="display:flex;">
     <?php foreach($components as $component): ?>
@@ -48,7 +48,7 @@ $components = $product->components()
 
 <?php
 
-$primary = $product->components()->main()->current()->first();
+$primary = $product->components()->type('secondary')->period('current')->first();
 $price = $primary->price();
 
 ?>
@@ -59,8 +59,8 @@ $price = $primary->price();
     </p>
 </div>
 
-<?php if ($product->shouldDisplayPeriod()): ?>
+
 <div>
     <p>Hintajakso <?= $primary->get('valid_from'); ?> - <?= $primary->get('valid_to'); ?></p>
 </div>
-<?php endif; ?>
+

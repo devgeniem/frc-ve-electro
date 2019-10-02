@@ -69,6 +69,16 @@ class Price
         );
     }
 
+    public function getUnit()
+    {
+        return sprintf(
+            '%s%s%s',
+            $this->getCurrencySymbol(),
+            $this->getPerDelimiter(),
+            $this->getPerUnit()
+        );
+    }
+
     public function format($money)
     {
         $amount = $money->getAmount();

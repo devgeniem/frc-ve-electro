@@ -11,24 +11,23 @@ class Temporary extends Standard
         return 'temporary';
     }
 
-    protected function mutateComponents($items)
+    public function components()
     {
-        $items = $items->map(function($item) {
-            $from = Carbon::parse($item['valid_from'])
-                ->startOfMonth()
-                ->addMonths(6)
-                ->endOfMonth();
+        return $this->components->period('active')
+            ->map(function($item) {
+                $from = Carbon::parse($item['valid_from'])
+                    ->startOfMonth()
+                    ->addMonths(6)
+                    ->endOfMonth();
 
-            $item['valid_to'] = $from->toString();
-            return $item;
-        });
-
-        return $items;
+                $item['valid_to'] = $from->toString();
+                return $item;
+            });
     }
 
     public function periods()
     {
-        if ( $this->components()->secondary() ) {
+        if ( $this->components()->period('secondary') ) {
             return [
                 'primary',
                 'secondary',
@@ -90,5 +89,13 @@ class Temporary extends Standard
     public function shouldDisplayPeriod()
     {
         return $this->payload->get('protection_method') === 'Puolivuotistuote';
+    }
+
+    public function getMeta()
+    {
+        return [
+            'contract_duration',
+            'price_period',
+        ];
     }
 }

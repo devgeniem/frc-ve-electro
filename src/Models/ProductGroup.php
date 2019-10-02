@@ -3,6 +3,7 @@
 namespace VE\Electro\Models;
 
 use VE\Electro\WordPress\Model;
+use VE\Electro\Product\ProductRepository;
 
 class ProductGroup extends Model
 {
@@ -15,4 +16,12 @@ class ProductGroup extends Model
     protected $labels = [
         'name' => 'Product Groups',
     ];
+
+    protected function getProductsAttribute()
+    {
+        $ids = collect($this->meta->ec_products);
+        return $ids->map(function($id) {
+            return ProductRepository::get($id);
+        });
+    }
 }

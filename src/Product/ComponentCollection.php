@@ -11,12 +11,12 @@ class ComponentCollection extends PayloadCollection
      *
      * @return $this
      */
-    public function main()
+    public function typeSecondary()
     {
         return $this->where('sort_order', '<=', 1);
     }
 
-    public function items()
+    public function typePrimary()
     {
         return $this->where('sort_order', '>', 1);
     }
@@ -24,7 +24,14 @@ class ComponentCollection extends PayloadCollection
     public function period($key)
     {
         // @TODO: Error handling
-        return $this->$key();
+        $key = 'period' . ucfirst($key);
+        return $this->{$key}();
+    }
+
+    public function type($key)
+    {
+        $key = 'type' . ucfirst($key);
+        return $this->{$key}();
     }
 
     protected function filterByDate($date)
@@ -40,19 +47,19 @@ class ComponentCollection extends PayloadCollection
         return $items;
     }
 
-    public function current()
+    public function periodCurrent()
     {
         return $this->filterByDate(Carbon::now());
     }
 
-    public function primary()
+    public function periodPrimary()
     {
-        return $this->active();
+        return $this->periodActive();
     }
 
-    public function secondary()
+    public function periodSecondary()
     {
-        $primary = $this->primary();
+        $primary = $this->periodPrimary();
 
         $now = Carbon::now();
 
@@ -60,16 +67,16 @@ class ComponentCollection extends PayloadCollection
         $prev = $primary->first()->get('valid_from')->addMonths(2)->endOfMonth();
 
         if ( $now->greaterThanOrEqualTo($next) ) {
-            return $this->next($primary);
+            return $this->periodNext($primary);
         }
 
         if ( $now->lessThan($prev) ) {
-            return $this->prev($primary);
+            return $this->periodPrev($primary);
         }
 
     }
 
-    public function active()
+    public function periodActive()
     {
         // @TODO: Get period of relevant to user.
         // E.g. show next period already 14 days before valid_from date.
@@ -84,10 +91,10 @@ class ComponentCollection extends PayloadCollection
         return $this;
     }
 
-    public function next($by = null)
+    public function periodNext($by = null)
     {
         if (! $by ) {
-            $by = $this->current()->first();
+            $by = $this->periodCurrent()->first();
         } else {
             $by = $by->first();
         }
@@ -104,10 +111,10 @@ class ComponentCollection extends PayloadCollection
         });
     }
 
-    public function prev($by = null)
+    public function periodPrev($by = null)
     {
         if (! $by ) {
-            $by = $this->current()->first();
+            $by = $this->periodCurrent()->first();
         } else {
             $by = $by->first();
         }
