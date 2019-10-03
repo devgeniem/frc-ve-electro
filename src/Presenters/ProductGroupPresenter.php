@@ -7,7 +7,11 @@ class ProductGroupPresenter extends Presenter
     protected function products()
     {
         $products = $this->entity->products;
-        return $products->map(function($entity) {
+        return $products
+            ->sortBy(function($entity) {
+                return $entity->getProductName();
+            })
+            ->map(function($entity) {
             return new ProductPresenter($entity);
         });
     }
