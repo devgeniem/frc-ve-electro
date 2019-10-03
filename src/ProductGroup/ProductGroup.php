@@ -61,7 +61,6 @@ class ProductGroup
     {
         $group = $this->getRelatedGroup();
         $has = $group->model->products;
-        var_dump($has);
         return $has;
     }
 
