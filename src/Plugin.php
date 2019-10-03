@@ -11,7 +11,6 @@ class Plugin
 
     public static function boot()
     {
-
         static::load();
         Admin\Admin::load();
     }
@@ -19,11 +18,24 @@ class Plugin
     public static function load()
     {
         add_action('init', [__CLASS__, 'actions_init']);
-        
+
         add_action('cli_init', [__CLASS__, 'cli_init']);
 
         add_action('init', [__CLASS__, 'models_init']);
         add_action('acf/init', [__CLASS__, 'acf_init']);
+
+        // @TOOD: Move code
+        add_filter('pll_get_post_types', function( $post_types, $is_settings ) {
+            if ( $is_settings ) {
+                // hides 'my_cpt' from the list of custom post types in Polylang settings
+                unset( $post_types['product_group'] );
+            } else {
+                // enables language and translation management for 'my_cpt'
+                $post_types['product_group'] = 'product_group';
+            }
+            return $post_types;
+        }, 10, 2 );
+
     }
 
     public static function acf_init()
