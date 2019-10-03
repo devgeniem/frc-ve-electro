@@ -13,10 +13,10 @@ class Temporary extends Standard
 
     public function components()
     {
-        
+
         $items = $this->components
             ->period($this->getFilter('period'));
-        
+
         if (! $items ) {
             return;
         }
@@ -34,7 +34,7 @@ class Temporary extends Standard
 
     public function periods()
     {
-        if ( $this->components->period('secondary') ) {
+        if ( $this->components()->period('secondary') ) {
             return [
                 'primary',
                 'secondary',
