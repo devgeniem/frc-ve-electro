@@ -3,6 +3,7 @@
 namespace VE\Electro\Presenters;
 
 use VE\Electro\Support\Str;
+use VE\Electro\Electro;
 
 class ProductPresenter extends Presenter
 {
@@ -32,7 +33,7 @@ class ProductPresenter extends Presenter
 
     public function contract_duration()
     {
-        return 'Sopimuksen kesto: ' . $this->entity->getContractDuration();
+        return Electro::translate('contract_duration') . ': ' . $this->entity->getContractDuration();
     }
 
     public function price_period()
@@ -43,7 +44,7 @@ class ProductPresenter extends Presenter
         }
         $from = $main->get('valid_from')->setTimezone('Europe/Helsinki')->format('j.n.');
         $to = $main->get('valid_to')->setTimezone('Europe/Helsinki')->subDay()->format('j.n.Y');
-        return "Hintajakso: {$from}-{$to}";
+        return Electro::translate('price_period') . ": {$from}-{$to}";
     }
 
     public function meta()

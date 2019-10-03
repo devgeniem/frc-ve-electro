@@ -62,6 +62,16 @@ class Electro
                 'fi' => 'Tilaa',
                 'en' => 'Order',
                 'sv' => 'Beställa',
+            ],
+            'price_period' => [
+                'fi' => 'Hintajakso',
+                'en' => 'Price period',
+                'sv' => 'Prisperiod',
+            ],
+            'contract_duration' => [
+                'fi' => 'Sopimuksen kesto',
+                'en' => 'Contract duration',
+                'sv' => 'Avtalets längd',
             ]
         ];
 
