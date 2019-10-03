@@ -74,6 +74,8 @@ class ComponentCollection extends PayloadCollection
             return $this->periodPrev($primary);
         }
 
+        return new static([]);
+
     }
 
     public function periodActive()
