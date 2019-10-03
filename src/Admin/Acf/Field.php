@@ -1,7 +1,7 @@
 <?php
 namespace VE\Electro\Admin\Acf;
 
-class Field
+abstract class Field
 {
     protected function field($key)
     {

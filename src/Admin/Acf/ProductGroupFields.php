@@ -23,6 +23,29 @@ class ProductGroupFields extends Field
 
             'label' => 'Title',
             'type' => 'text',
+            'wrapper' => [
+                'width' => '50%',
+            ],
+        ];
+
+        $field_related_page = [
+            'key' => $this->field('related_page'),
+            'name' => 'related_page',
+
+            'label' => 'Marketing page',
+            'type' => 'link',
+        ];
+
+        $field_logo = [
+            'key' => $this->field('logo'),
+            'name' => 'logo',
+
+            'label' => 'Logo',
+            'type' => 'image',
+            'return_format' => 'id',
+            'wrapper' => [
+                'width' => '50%',
+            ],
         ];
 
         $field_short_title = [
@@ -39,14 +62,42 @@ class ProductGroupFields extends Field
 
             'label' => 'Description',
             'type' => 'textarea',
+            'wrapper' => [
+                'width' => '50%',
+            ],
         ];
 
         $field_short_description = [
             'key' => $this->field('description_short'),
             'name' => 'description_short',
 
-            'label' => 'Short Description',
+            'label' => 'Short description',
             'type' => 'textarea',
+            'wrapper' => [
+                'width' => '50%',
+            ],
+        ];
+
+        $field_additional_description = [
+            'key' => $this->field('additional_description'),
+            'name' => 'additional_description',
+
+            'label' => 'Additional description',
+            'type' => 'textarea',
+            'wrapper' => [
+                'width' => '50%',
+            ],
+        ];
+
+        $field_short_additional_description = [
+            'key' => $this->field('additional_description_short'),
+            'name' => 'additional_description_short',
+
+            'label' => 'Short additional description',
+            'type' => 'textarea',
+            'wrapper' => [
+                'width' => '50%',
+            ],
         ];
 
         $location = [
@@ -60,9 +111,13 @@ class ProductGroupFields extends Field
             'fields' => [
                 $field_products,
                 $field_title,
+                $field_logo,
                 $field_short_title,
                 $field_description,
+                $field_additional_description,
                 $field_short_description,
+                $field_short_additional_description,
+                $field_related_page,
             ],
             'location' => [
                 [
