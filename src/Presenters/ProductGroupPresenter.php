@@ -39,4 +39,9 @@ class ProductGroupPresenter extends Presenter
     {
         return $this->entity->getRelatedPeriodGroup();
     }
+
+    public function isType($type)
+    {
+        return $this->products->first()->isType($type);
+    }
 }
