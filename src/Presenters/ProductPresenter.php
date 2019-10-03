@@ -38,6 +38,9 @@ class ProductPresenter extends Presenter
     public function price_period()
     {
         $main = $this->entity->components()->first();
+        if (! $main) {
+            return;
+        }
         $from = $main->get('valid_from')->setTimezone('Europe/Helsinki')->format('j.n.');
         $to = $main->get('valid_to')->setTimezone('Europe/Helsinki')->subDay()->format('j.n.Y');
         return "Hintajakso: {$from}-{$to}";

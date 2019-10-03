@@ -28,9 +28,8 @@ $product = ProductRepository::get($post->ID);
 </div>
 
 <?php
-$components = $product->components()
-    ->type('primary')
-    ->period('current')
+$components = $product->components
+    ->type('primary');
 ?>
 <div style="display:flex;">
     <?php foreach($components as $component): ?>
@@ -48,7 +47,7 @@ $components = $product->components()
 
 <?php
 
-$primary = $product->components()->type('secondary')->period('current')->first();
+$primary = $product->components->type('secondary')->first();
 $price = $primary->price();
 
 ?>
