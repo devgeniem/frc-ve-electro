@@ -4,10 +4,7 @@ namespace VE\Electro\Product\Variations;
 
 class Spot extends Standard
 {
-    public function getType()
-    {
-        return 'spot';
-    }
+    public const TYPE = 'spot';
 
     public function components()
     {

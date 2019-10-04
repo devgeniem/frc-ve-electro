@@ -6,10 +6,7 @@ use Carbon\Carbon;
 
 class Temporary extends Standard
 {
-    public function getType()
-    {
-        return 'temporary';
-    }
+    public const TYPE = 'temporary';
 
     public function components()
     {

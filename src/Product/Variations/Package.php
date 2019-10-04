@@ -4,22 +4,20 @@ namespace VE\Electro\Product\Variations;
 
 class Package extends Standard
 {
+    public const TYPE = 'package';
+
     public function getMeasurementMethodName()
     {
         return $this->getDescription();
     }
 
-    protected function mutateComponents($items)
+    public function components()
     {
-        $items = $items->filter(function($item) {
+        return $this->components->filter(function($item) {
             return $item['sort_order'] != 2;
-        });
-
-        $items = $items->map(function($item) {
+        })->map(function($item) {
             $item['sort_order'] = 2;
             return $item;
         });
-
-        return $items;
     }
 }
