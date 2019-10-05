@@ -3,10 +3,11 @@
 namespace VE\Electro\Product;
 
 use Carbon\Carbon;
-
 use VE\Electro\Electro;
 use VE\Electro\Presenters\ProductComponentPresenter;
-class Component extends PayloadCollection
+use VE\Electro\Product\Collections\PayloadCollection;
+
+class ProductComponent extends PayloadCollection
 {
     public function getName()
     {

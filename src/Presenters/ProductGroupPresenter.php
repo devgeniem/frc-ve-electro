@@ -12,8 +12,8 @@ class ProductGroupPresenter extends Presenter
                 return $entity->getProductName();
             })
             ->map(function($entity) {
-            return new ProductPresenter($entity);
-        });
+                return $entity->present();
+            });
     }
 
     protected function periods()
@@ -32,7 +32,13 @@ class ProductGroupPresenter extends Presenter
         if (! $period) {
             return;
         }
-        return (bool) $period->products->first()->components();
+
+        $comp = $period->products->first()->components();
+        if (! $comp) {
+            return;
+        }
+
+        return (bool) $comp->all();
     }
 
     protected function relatedPeriodGroup()
@@ -42,6 +48,6 @@ class ProductGroupPresenter extends Presenter
 
     public function isType($type)
     {
-        return $this->products->first()->isType($type);
+        return $this->entity->isType($type);
     }
 }

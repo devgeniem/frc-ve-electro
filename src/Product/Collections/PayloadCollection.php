@@ -1,6 +1,6 @@
 <?php
 
-namespace VE\Electro\Product;
+namespace VE\Electro\Product\Collections;
 
 use Carbon\Carbon;
 use VE\Electro\EnerimCIS\Code;

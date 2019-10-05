@@ -55,14 +55,14 @@ class ProductPresenter extends Presenter
         }, $keys);
     }
 
+    public function isOrderable()
+    {
+        return $this->entity->isActive();
+    }
+
     public function order_link()
     {
         return $this->entity->getOrderLink();
-    }
-
-    public function order_text()
-    {
-        return 'Tilaa';
     }
 
     public function isType($type) {
