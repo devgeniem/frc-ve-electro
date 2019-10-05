@@ -64,6 +64,15 @@ class Admin
         );
 
         add_meta_box(
+            'ec_product_payload',
+            'Flatted Payload',
+            function($post) {
+                require 'views/payload.php';
+            },
+            'ec_product',
+        );
+
+        add_meta_box(
             'ec_product_data',
             'API Payload',
             function($post) {

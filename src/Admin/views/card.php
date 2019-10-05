@@ -9,6 +9,16 @@ $product = ProductRepository::get($post->ID);
 
 <div>
     <strong>Name</strong>
+    <p><?= $product->getName(); ?></p>
+</div>
+
+<div>
+    <strong>Type</strong>
+    <p><?= $product->getType(); ?></p>
+</div>
+
+<div>
+    <strong>Grop</strong>
     <p><?= $product->getGroup(); ?></p>
 </div>
 
@@ -18,18 +28,17 @@ $product = ProductRepository::get($post->ID);
 </div>
 
 <div>
-    <strong>Bonusta</strong>
+    <strong>Is Bonus product</strong>
     <p><?= $product->isBonusProduct() ? 'Kyllä' : 'Ei'; ?></p>
 </div>
 
 <div>
     <strong>Hintajakso</strong>
-    <p><?= $product->getContractType(); ?></p>
+    <p><?= $product->getContractDuration(); ?></p>
 </div>
 
 <?php
-$components = $product->components
-    ->type('primary');
+$components = $product->components();
 ?>
 <div style="display:flex;">
     <?php foreach($components as $component): ?>
@@ -41,25 +50,9 @@ $components = $product->components
             <span>
                 <?= $price->output(); ?>
             </span>
+            <div>
+                <?= $component->get('valid_from'); ?> - <?= $component->get('valid_to'); ?>
+            </div>
         </div>
     <?php endforeach; ?>
 </div>
-
-<?php
-
-$primary = $product->components->type('secondary')->first();
-$price = $primary->price();
-
-?>
-<div>
-    <p>
-        <?= $primary->getDescription(); ?>
-        <?= $price->output(); ?>
-    </p>
-</div>
-
-
-<div>
-    <p>Hintajakso <?= $primary->get('valid_from'); ?> - <?= $primary->get('valid_to'); ?></p>
-</div>
-
