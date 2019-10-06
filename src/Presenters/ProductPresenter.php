@@ -65,6 +65,11 @@ class ProductPresenter extends Presenter
         return $this->entity->getOrderLink();
     }
 
+    public function order_text()
+    {
+        return Electro::translate('order');
+    }
+
     public function isType($type) {
         return $this->entity->isType($type);
     }
