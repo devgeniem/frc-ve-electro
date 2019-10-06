@@ -22,6 +22,7 @@ class Product extends Model
     protected $payloadMutated;
     protected $componentsMutated;
 
+
     /**
      * Attribute mutator getters
      */
@@ -32,7 +33,13 @@ class Product extends Model
             return $this->payloadMutated;
         }
 
-        return $this->payloadMutated = collect($this->meta->payload)->recursive();
+        return $this->payloadMutated = $this->payloadCollection
+            ->put('product_components', $this->components);
+    }
+
+    protected function getPayloadCollectionAttribute($value)
+    {
+        return collect($this->meta->payload)->recursive();
     }
 
     protected function getComponentsAttribute($value)
@@ -41,7 +48,7 @@ class Product extends Model
             return $this->componentsMutated;
         }
 
-        $prices = $this->payload
+        return $this->componentsMutated = $this->payloadCollection
             ->get('product_components', collect([]))
             ->map(function($component) {
                 // Merge component_prices and single product_components item

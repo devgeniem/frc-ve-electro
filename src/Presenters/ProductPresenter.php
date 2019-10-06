@@ -55,6 +55,11 @@ class ProductPresenter extends Presenter
         }, $keys);
     }
 
+    public function isOrderable()
+    {
+        return $this->entity->isActive();
+    }
+
     public function order_link()
     {
         return $this->entity->getOrderLink();
@@ -62,7 +67,7 @@ class ProductPresenter extends Presenter
 
     public function order_text()
     {
-        return 'Tilaa';
+        return Electro::translate('order');
     }
 
     public function isType($type) {

@@ -3,25 +3,27 @@
 namespace VE\Electro\Product;
 
 use VE\Electro\EnerimCIS\Code;
-use VE\Electro\Models\Product;
+use VE\Electro\Models\Product as ProductModel;
 
 class ProductRepository
 {
     public static function factory($model)
     {
+        $context = new Context\Standard();
+
         if ( $model->payload->get('product_group') === Code::GROUP_PACKAGE ) {
-            return new Variations\Package($model);
+            $context = new Context\Package();
         }
 
-        if ( $model->payload->get('protection_method') === Code::TYPE_TEMPORARY ) {
-            return new Variations\Temporary($model);
+        elseif ( $model->payload->get('protection_method') === Code::TYPE_TEMPORARY ) {
+            $context = new Context\Temporary();
         }
 
-        if ( $model->payload->get('protection_method') === Code::TYPE_SPOT ) {
-            return new Variations\Spot($model);
+        elseif ( $model->payload->get('protection_method') === Code::TYPE_SPOT ) {
+            $context = new Context\Spot();
         }
 
-        return new Variations\Standard($model);
+        return new Product($model, $context);
     }
 
     public static function get(int $id)
@@ -33,7 +35,7 @@ class ProductRepository
 
     public static function query(array $args = [])
     {
-        $results = Product::query($args);
+        $results = ProductModel::query($args);
 
         $results = $results->map(function($item) {
             return static::factory($item);
