@@ -13,6 +13,7 @@ class ProductPresenter extends Presenter
         return Str::ucfirst($title);
     }
 
+    // @todo: change this to subtitle
     public function subtitle()
     {
         return $this->name;
@@ -77,5 +78,13 @@ class ProductPresenter extends Presenter
     public function hasComponents()
     {
         return (bool) $this->entity->components();
+    }
+
+    public function getCustomerType() {
+        return $this->entity->getCustomerType();
+    }
+
+    public function isCompany() {
+        return $this->entity->isCompany();
     }
 }

@@ -36,6 +36,7 @@ class Price
         $this->withVat = $args['withVat'];
         $this->perUnit = $args['perUnit'];
 
+        // @todo: locale
         $numberFormatter = new NumberFormatter('fi_FI', NumberFormatter::DECIMAL);
         $numberFormatter->setAttribute(
             NumberFormatter::FRACTION_DIGITS,

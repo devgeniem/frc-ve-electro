@@ -73,6 +73,19 @@ class Product
         return $this->getType() == $type;
     }
 
+    public function getCustomerType() {
+        return $this->getDynamicPropertyValue('CustomerType')->first();
+    }
+
+    // @todo: clean this
+    public function isCompany() {
+        return $this->getCustomerType() == 'Yritys / organisaatio';
+    }
+
+    public function isCustomer() {
+        return !$this->isCompany();
+    }
+
     public function get($key)
     {
         return $this->payload()->get($key);
