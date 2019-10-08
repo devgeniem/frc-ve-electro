@@ -68,6 +68,11 @@ class Product
         return $this->context->getType();
     }
 
+    public function isType($type)
+    {
+        return $this->getType() == $type;
+    }
+
     public function get($key)
     {
         return $this->payload()->get($key);
