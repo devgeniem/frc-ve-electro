@@ -72,6 +72,21 @@ class Electro
                 'fi' => 'Sopimuksen kesto',
                 'en' => 'Contract duration',
                 'sv' => 'Avtalets längd',
+            ],
+            'all_homes' => [
+                'fi' => 'Kaikki kodit',
+                'en' => 'Contract duration',
+                'sv' => 'Avtalets längd',
+            ],
+            'all_households' => [
+                'fi' => 'Kaikki kodit',
+                'en' => 'All households',
+                'sv' => 'Alla hushåll',
+            ],
+            'electric_heating' => [
+                'fi' => 'Sähkölämmittäjät',
+                'en' => 'Electric heating',
+                'sv' => 'Eluppvärmning',
             ]
         ];
 

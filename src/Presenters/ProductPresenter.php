@@ -16,13 +16,29 @@ class ProductPresenter extends Presenter
     // @todo: change this to subtitle
     public function subtitle()
     {
-        return $this->name;
+        return $title = $this->entity->getSubtitle() . ' (' .$this->name .')';
     }
 
     public function name()
     {
         return $this->entity->getProductName();
     }
+
+    public function description() {
+        return $this->entity->getDescription();
+    }
+
+    // @todo: hack
+    public function getPacketSubtitle() {
+        if (strpos($this->description(), ' S') !== false ) {
+            return '<2000 kWh/v' . ' (' . $this->name . ')';
+        } else if (strpos($this->description(), ' M') !== false ) {
+            return '2000-3000 kWh/v' . ' (' . $this->name . ')';
+        }else if (strpos($this->description(), ' L') !== false ) {
+            return '3000-4000 kWh/v' . ' (' . $this->name . ')';
+        }
+    }
+
 
     public function components()
     {

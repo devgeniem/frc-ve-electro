@@ -2,8 +2,6 @@
 
 namespace VE\Electro\Product\Context;
 
-use Carbon\Carbon;
-
 class Package extends Standard
 {
     public const TYPE = 'package';

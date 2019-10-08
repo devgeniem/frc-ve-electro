@@ -155,6 +155,18 @@ class Product
         return $titles[$key];
     }
 
+    public function getSubtitle() {
+        $key = $this->getMeasurementMethodId();
+
+        $titles = [
+            '1' => Electro::translate('all_households'),
+            '2' => Electro::translate('electric_heating'),
+            '3' => Electro::translate('electric_heating')
+        ];
+
+        return $titles[$key];
+    }
+
     public function getOrderLink()
     {
         // @TODO: Get base from ENVs
