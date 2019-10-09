@@ -16,7 +16,13 @@ class ProductPresenter extends Presenter
     // @todo: change this to subtitle
     public function subtitle()
     {
-        return $title = $this->entity->getSubtitle() . ' (' .$this->name .')';
+        $subtitle = $this->entity->getSubtitle();
+        $code = ' (' . $this->name . ')';
+        $title = $subtitle.$code;
+        if ($this->isCompany()) {
+            $title = $code;
+        }
+        return $title;
     }
 
     public function name()
