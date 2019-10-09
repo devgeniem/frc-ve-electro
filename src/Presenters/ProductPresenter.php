@@ -13,6 +13,10 @@ class ProductPresenter extends Presenter
         return Str::ucfirst($title);
     }
 
+    public function measurementMethodId() {
+        return $this->entity->getMeasurementMethodId();
+    }
+
     // @todo: change this to subtitle
     public function subtitle()
     {
