@@ -19,6 +19,10 @@ class ProductRepository
             $context = new Context\Temporary();
         }
 
+        elseif ( $model->payload->get('protection_method') === Code::TYPE_TARIFF ) {
+            $context = new Context\Tariff();
+        }
+
         elseif ( $model->payload->get('protection_method') === Code::TYPE_SPOT ) {
             $context = new Context\Spot();
         }

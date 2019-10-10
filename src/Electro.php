@@ -87,7 +87,12 @@ class Electro
                 'fi' => 'Sähkölämmittäjät',
                 'en' => 'Electric heating',
                 'sv' => 'Eluppvärmning',
-            ]
+            ],
+            'from' => [
+                'fi' => '%s alkaen',
+                'en' => 'från %s',
+                'en' => 'from %s',
+            ],
         ];
 
         return $translations[$key][$locale] ?? $key;
