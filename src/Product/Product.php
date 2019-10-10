@@ -169,8 +169,7 @@ class Product
 
     public function getOrderLink()
     {
-        // @TODO: Get base from ENVs
-        $base_uri = 'https://193.208.127.194:83';
+        $base_uri = getenv('SOPA_BASE_URL') ?: 'https://193.208.127.194:83';
         $path = '/NewContract/Contract/EndProcess';
         $args = array_filter([
             'selectedProductCode' => $this->getProductName(),
