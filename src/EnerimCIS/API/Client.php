@@ -2,13 +2,20 @@
 
 namespace VE\Electro\EnerimCIS\API;
 
+use Exception;
 use VE\Electro\Support\Str;
+use WP_Error;
 use WP_Http_Curl;
 
 class Client
 {
 
-    public function setCurlOptions($handle, $r, $url) {
+    /**
+     * @param $handle
+     * @param $r
+     * @param $url
+     */
+    public static function setCurlOptions($handle, $r, $url) {
         if (!env('ENERIM_KEY') && !env('ENERIM_CERT') || strpos($url, env('ENERIM_BASE_URL')) === false) {
             return;
         }
@@ -48,6 +55,9 @@ class Client
         }
     }
 
+    /**
+     *
+     */
     public function cleanCertFiles() {
         $tempDir = trailingslashit(sys_get_temp_dir());
         $keyPath = $tempDir . 'key.pem';
@@ -56,12 +66,19 @@ class Client
         unlink($certPath);
     }
 
-
+    /**
+     * @param $method
+     * @param $path
+     * @param array $args
+     *
+     * @return array|Response|WP_Error
+     * @throws Exception
+     */
     public function request($method, $path, $args = [])
     {
         $baseUrl = env('ENERIM_BASE_URL');
         if (!$baseUrl) {
-            throw new \Exception('EnerimCIS API request failed. Env ENERIM_BASE_URL missing!');
+            throw new Exception('EnerimCIS API request failed. Env ENERIM_BASE_URL missing!');
         }
         $uri = trailingslashit($baseUrl) . $path;
 
@@ -76,10 +93,14 @@ class Client
             'headers'     => [
                 'Accept'       => 'application/json',
                 'Content-Type' => 'application/json',
-                'User'         => 'Frantic'
+                'User'         => 'Frantic',
+                'User-Agent'   => ''
             ],
             'body'    => null,
             'cookies' => [],
+            'stream' => false,
+            'decompress' => true,
+            'filename' => ''
         ];
         $args = wp_parse_args($args, $defaults);
 
@@ -91,22 +112,29 @@ class Client
         $this->cleanCertFiles();
 
         if (is_wp_error($response)) {
-            throw new \Exception('EnerimCIS API request failed.');
+            throw new Exception('EnerimCIS API request failed.');
         }
 
         $response = new Response($response);
 
         if (! Str::contains($response->getHeader('content-type'), 'application/json')) {
-            throw new \Exception('EnerimCIS API request returned a non-JSON result.');
+            throw new Exception('EnerimCIS API request returned a non-JSON result.');
         }
 
         if (! $response->isValid()) {
-            throw new \Exception('EnerimCIS API request is not valid.');
+            throw new Exception('EnerimCIS API request is not valid.');
         }
 
         return $response;
     }
 
+    /**
+     * @param $name
+     * @param $args
+     *
+     * @return array|Response|WP_Error
+     * @throws Exception
+     */
     public function __call($name, $args)
     {
         /**
@@ -115,12 +143,18 @@ class Client
         $method = Str::upper($name);
 
         if (! in_array($method, ['GET'])) {
-            throw new \Exception(sprintf('EnerimCIS API: Method \'%s\' is not supported.', $method));
+            throw new Exception(sprintf('EnerimCIS API: Method \'%s\' is not supported.', $method));
         }
 
         return $this->request($method, ...$args);
     }
 
+    /**
+     * @param array $args
+     *
+     * @return array|Response|WP_Error
+     * @throws Exception
+     */
     public function getProducts($args = []) {
 
         $urlPath = 'products/';
@@ -134,6 +168,9 @@ class Client
         return $this->get($path);
     }
 
+    /**
+     * @return mixed
+     */
     public function getProductsTest()
     {
         $uri = home_url('ContractChannel_Verkkosivut.json');
