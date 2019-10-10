@@ -97,7 +97,12 @@ class Electro
                 'fi' => '+  Vaihtuva Spot-hinta',
                 'en' => '+ Spot price',
                 'sv' => '+ Spot priset',
-            ]
+            ],
+            'from' => [
+                'fi' => '%s alkaen',
+                'en' => 'from %s',
+                'sv' => 'från %s',
+            ],
         ];
 
         return $translations[$key][$locale] ?? $key;

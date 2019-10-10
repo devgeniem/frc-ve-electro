@@ -38,9 +38,14 @@ class ProductGroup
         return $this->args[$key] ?? null;
     }
 
+    protected function referenceProduct()
+    {
+        return $this->model->products->first();
+    }
+
     public function getType()
     {
-        return $this->model->products->first()->getType();
+        return $this->referenceProduct()->getType();
     }
 
     public function isType($type)
@@ -50,18 +55,16 @@ class ProductGroup
 
     public function getRelatedPeriodGroup()
     {
-        if ( $this->isType('temporary') && $this->args('period') == 'primary' ) {
+        if ( $this->hasRelatedPeriodGroup() ) {
             return new static($this->model, [
                 'period' => 'secondary',
             ]);
         }
     }
 
-    public function hasRelatedGroup()
+    public function hasRelatedPeriodGroup()
     {
-        $group = $this->getRelatedGroup();
-        $has = $group->model->products;
-        return $has;
+        return $this->referenceProduct()->hasRelatedPeriodGroup() && $this->args('period') == 'primary' ;
     }
 
     public function periods()

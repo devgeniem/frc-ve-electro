@@ -74,6 +74,16 @@ class ProductPresenter extends Presenter
         return Electro::translate('price_period') . ": {$from}-{$to}";
     }
 
+    public function price_period_from()
+    {
+        $main = $this->entity->components()->first();
+        if (! $main) {
+            return;
+        }
+        $from = $main->get('valid_from')->setTimezone('Europe/Helsinki')->format('j.n.Y');
+        return Electro::translate('price_period') . ": " . sprintf(Electro::translate('from'), $from);
+    }
+
     public function meta()
     {
         $keys = $this->entity->getMeta();
