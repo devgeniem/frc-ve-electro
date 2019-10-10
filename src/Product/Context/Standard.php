@@ -6,6 +6,8 @@ class Standard
 {
     public const TYPE = 'standard';
 
+    protected $hasRelatedPeriodGroup = false;
+
     public function getType()
     {
         return static::TYPE;
@@ -19,6 +21,11 @@ class Standard
     public function nextDaysPrior()
     {
         return 0;
+    }
+
+    public function hasRelatedPeriodGroup()
+    {
+        return $this->hasRelatedPeriodGroup;
     }
 
     public function meta()
