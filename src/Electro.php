@@ -73,11 +73,6 @@ class Electro
                 'en' => 'Contract duration',
                 'sv' => 'Avtalets längd',
             ],
-            'all_homes' => [
-                'fi' => 'Kaikki kodit',
-                'en' => 'Contract duration',
-                'sv' => 'Avtalets längd',
-            ],
             'all_households' => [
                 'fi' => 'Kaikki kodit',
                 'en' => 'All households',
@@ -86,7 +81,22 @@ class Electro
             'electric_heating' => [
                 'fi' => 'Sähkölämmittäjät',
                 'en' => 'Electric heating',
-                'sv' => 'Eluppvärmning',
+                'sv' => 'Elvärmning',
+            ],
+            'vat_0' => [
+                'fi' => 'Näytä hinta ilman arvonlisäveroa (ALV 0 %)',
+                'en' => 'Show prices without VAT (0 %)',
+                'sv' => 'Visa priser utan moms (0 %)',
+            ],
+            'vat_24' => [
+                'fi' => 'Näytä hinta arvonlisäverolla (ALV 24 %)',
+                'en' => 'Show prices with VAT (24 %)',
+                'sv' => 'Visa priser med moms (24 %)',
+            ],
+            'spot' => [
+                'fi' => '+  Vaihtuva Spot-hinta',
+                'en' => '+ Spot price',
+                'sv' => '+ Spot priset',
             ]
         ];
 
