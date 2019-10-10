@@ -189,6 +189,11 @@ class Product
 
     }
 
+    public function hasRelatedPeriodGroup()
+    {
+        return $this->context->hasRelatedPeriodGroup();
+    }
+
     public function present() {
         return new Presenters\ProductPresenter($this);
     }

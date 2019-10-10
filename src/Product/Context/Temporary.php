@@ -8,6 +8,8 @@ class Temporary extends Standard
 {
     public const TYPE = 'temporary';
 
+    protected $hasRelatedPeriodGroup = true;
+
     public function components($components)
     {
         return $components->map(function($item) {
