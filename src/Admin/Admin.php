@@ -20,6 +20,16 @@ class Admin
             'manage_ec_product_posts_columns',
             [new ListTable\AddLastModified, 'handle']
         );
+
+        add_action(
+            'admin_bar_menu',
+            [new AdminBar\SyncEnerimProducts, 'handle'], 999
+        );
+
+        add_action(
+            'admin_post_enerim_sync_products',
+            [new Actions\EnerimSyncProducts, 'handle']
+        );
     }
 
     public static function action_enerim_json_upload()
