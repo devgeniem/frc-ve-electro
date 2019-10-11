@@ -173,11 +173,17 @@ class Product
         $path = '/NewContract/Contract/EndProcess';
         $args = array_filter([
             'selectedProductCode' => $this->getProductName(),
+            'campaignCode' => $this->getCampaignCode(),
             'culture' => Electro::getLocale(),
             'brand' => $this->isBonusProduct() ? 'SBonus' : '',
         ]);
 
         return add_query_arg($args, $base_uri . $path);
+    }
+
+    public function getCampaignCode()
+    {
+        return $this->getDynamicPropertyValue('CampaignCode')->first();
     }
 
     public function isActive()
