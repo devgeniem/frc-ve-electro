@@ -9,7 +9,28 @@ class Admin
         add_action('add_meta_boxes', [__CLASS__, 'add_meta_boxes']);
         add_action('acf/init', [__CLASS__, 'add_settings_menu']);
         add_action('admin_menu', [__CLASS__, 'add_upload_page']);
+        add_action('admin_menu', [__CLASS__, 'add_sopa_page']);
         add_action('admin_post_enerim_json_upload', [__CLASS__, 'action_enerim_json_upload']);
+
+        add_action(
+            'manage_ec_product_posts_custom_column',
+            [new ListTable\DisplayLastModified, 'handle'], 10, 2
+        );
+
+        add_action(
+            'manage_ec_product_posts_columns',
+            [new ListTable\AddLastModified, 'handle']
+        );
+
+        add_action(
+            'admin_bar_menu',
+            [new AdminBar\SyncEnerimProducts, 'handle'], 999
+        );
+
+        add_action(
+            'admin_post_enerim_sync_products',
+            [new Actions\EnerimSyncProducts, 'handle']
+        );
     }
 
     public static function action_enerim_json_upload()
@@ -48,6 +69,20 @@ class Admin
             'json-upload',
             function() {
                 require 'views/upload.php';
+            }
+        );
+    }
+
+    public static function add_sopa_page()
+    {
+        add_submenu_page(
+            'edit.php?post_type=ec_product',
+            __('SOPA-link'),
+            __('SOPA-link'),
+            'manage_options',
+            'sopa-link',
+            function() {
+                require 'views/sopa.php';
             }
         );
     }
