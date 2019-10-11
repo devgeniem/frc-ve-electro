@@ -137,4 +137,13 @@ class Electro
 
         return $translations[$key][$locale] ?? $key;
     }
+
+    public static function sopaLink($args = [])
+    {
+        $base_uri = getenv('SOPA_BASE_URL') ?: 'https://193.208.127.194:83';
+        $path = '/NewContract/Contract/EndProcess';
+        $args = array_filter($args);
+
+        return add_query_arg($args, $base_uri . $path);
+    }
 }

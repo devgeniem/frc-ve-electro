@@ -37,6 +37,15 @@ $product = ProductRepository::get($post->ID);
     <p><?= $product->getContractDuration(); ?></p>
 </div>
 
+<div>
+    <strong>SOPA-link</strong>
+    <p>
+        <a href="<?= esc_url($product->getOrderLink()); ?>" target="_blank">
+            <?= $product->getOrderLink(); ?>
+        </a>
+    </p>
+</div>
+
 <?php
 $components = $product->components();
 ?>
