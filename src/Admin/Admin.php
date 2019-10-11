@@ -10,6 +10,16 @@ class Admin
         add_action('acf/init', [__CLASS__, 'add_settings_menu']);
         add_action('admin_menu', [__CLASS__, 'add_upload_page']);
         add_action('admin_post_enerim_json_upload', [__CLASS__, 'action_enerim_json_upload']);
+
+        add_action(
+            'manage_ec_product_posts_custom_column',
+            [new ListTable\DisplayLastModified, 'handle'], 10, 2
+        );
+
+        add_action(
+            'manage_ec_product_posts_columns',
+            [new ListTable\AddLastModified, 'handle']
+        );
     }
 
     public static function action_enerim_json_upload()
