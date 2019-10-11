@@ -58,6 +58,14 @@ class Price
         return $this;
     }
 
+    public function getwithVat() {
+        return $this->withVat;
+    }
+
+    public function getVatRate() {
+        return $this->vat->getRate();
+    }
+
     public function output()
     {
         // @TODO: maybe move logic
@@ -95,6 +103,17 @@ class Price
         }
 
         return $this->format($money);
+    }
+
+    // @todo: check the rounding (use format)
+    public function getNumber() {
+        $money = $this->money;
+
+        if ($this->withVat) {
+            $money = $this->vat->addTo($money);
+        }
+
+        return round($money->getAmount(), 2);
     }
 
     public function getCurrencySymbol()
