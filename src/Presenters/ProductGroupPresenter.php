@@ -50,4 +50,9 @@ class ProductGroupPresenter extends Presenter
     {
         return $this->entity->isType($type);
     }
+
+    public function getType()
+    {
+        return $this->entity->getType();
+    }
 }

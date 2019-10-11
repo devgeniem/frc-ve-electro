@@ -1,7 +1,9 @@
 <?php
 
+use VE\Electro\Electro;
 use VE\Electro\Support\Arr;
 use VE\Electro\Support\Collection;
+use VE\Electro\Support\Str;
 
 if (! function_exists('collect')) {
     /**
@@ -79,4 +81,73 @@ if (! function_exists('value')) {
 function get_product_group($id)
 {
     return VE\Electro\ProductGroup\ProductGroupRepository::get($id);
+}
+
+function get_basic_product_types() {
+    return [
+        [
+            'title'    => Str::ucfirst(Electro::translate('common')),
+            'subtitle' => Electro::translate('all_households'),
+        ],
+        [
+            'title'    => Str::ucfirst(Electro::translate('time')),
+            'subtitle' => Electro::translate('electric_heating'),
+        ],
+        [
+            'title'    => Str::ucfirst(Electro::translate('season')),
+            'subtitle' => Electro::translate('electric_heating'),
+        ]
+    ];
+}
+
+function get_comparison_inputs() {
+    return [
+        'inputs' => [
+            [
+                'metering_unit' => 1,
+                'labels' => [
+                    [
+                        'label' => Electro::translate('energy'),
+                        'value' => 2000
+                    ]
+                ]
+            ],
+            [
+                'metering_unit' => 2,
+                'labels' => [
+                    [
+                        'label' => Electro::translate('day_energy'),
+                        'value' => 1000
+                    ],
+                    [
+                        'label' => Electro::translate('night_energy'),
+                        'value' => 1000
+                    ]
+                ]
+            ],
+            [
+                'metering_unit' => 3,
+                'labels' => [
+                    [
+                        'label' => Electro::translate('winter_day_energy'),
+                        'value' => 1000
+                    ],
+                    [
+                        'label' => Electro::translate('other_time_energy'),
+                        'value' => 1000
+                    ]
+                ]
+            ],
+        ],
+        'count' => Electro::translate('count')
+    ];
+}
+
+function get_product_group_types($groups) {
+    $types = array_map(function ($group) {
+        return $group->getType();
+    }, $groups);
+    $types = array_unique($types);
+    $list = implode(' ', $types);
+    return $list;
 }

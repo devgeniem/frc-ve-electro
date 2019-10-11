@@ -103,6 +103,36 @@ class Electro
                 'en' => 'from %s',
                 'sv' => 'från %s',
             ],
+            'energy' => [
+                'fi' => 'Energia',
+                'en' => 'Energy',
+                'sv' => 'Energi',
+            ],
+            'day_energy' => [
+                'fi' => 'Päiväenergia',
+                'en' => 'Day Energy',
+                'sv' => 'Dag energi',
+            ],
+            'night_energy' => [
+                'fi' => 'Yöenergia',
+                'en' => 'Night Energy',
+                'sv' => 'Natt energi',
+            ],
+            'winter_day_energy' => [
+                'fi' => 'Talvipäiväenergia',
+                'en' => 'Winter day energy',
+                'sv' => 'Vinterdag energi',
+            ],
+            'other_time_energy' => [
+                'fi' => 'Muun ajan energia',
+                'en' => 'Other Time energy',
+                'sv' => 'Annan tidsenergi',
+            ],
+            'count' => [
+                'fi' => 'Laske',
+                'en' => 'Count',
+                'sv' => 'Räkna',
+            ]
         ];
 
         return $translations[$key][$locale] ?? $key;

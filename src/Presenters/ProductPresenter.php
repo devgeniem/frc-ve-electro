@@ -123,4 +123,8 @@ class ProductPresenter extends Presenter
     public function isCompany() {
         return $this->entity->isCompany();
     }
+
+    public function getType() {
+        return $this->entity->getType();
+    }
 }
