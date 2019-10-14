@@ -164,6 +164,10 @@ class Product
             '3' => Electro::translate('electric_heating')
         ];
 
+        if ($this->isCompany()) {
+            return '';
+        }
+
         return $titles[$key];
     }
 

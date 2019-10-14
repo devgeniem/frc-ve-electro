@@ -17,16 +17,14 @@ class ProductPresenter extends Presenter
         return $this->entity->getMeasurementMethodId();
     }
 
-    // @todo: change this to subtitle
     public function subtitle()
     {
         $subtitle = $this->entity->getSubtitle();
-        $code = ' (' . $this->name . ')';
-        $title = $subtitle.$code;
-        if ($this->isCompany()) {
-            $title = $code;
+        if (env('WP_ENV') == 'production') {
+            return $subtitle;
         }
-        return $title;
+
+        return $subtitle . ' (' . $this->name . ')';
     }
 
     public function name()
