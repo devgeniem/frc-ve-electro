@@ -117,11 +117,11 @@ function get_comparison_inputs() {
                 'labels' => [
                     [
                         'label' => Electro::translate('day_energy'),
-                        'value' => 1000
+                        'value' => 1200
                     ],
                     [
                         'label' => Electro::translate('night_energy'),
-                        'value' => 1000
+                        'value' => 800
                     ]
                 ]
             ],
@@ -130,11 +130,11 @@ function get_comparison_inputs() {
                 'labels' => [
                     [
                         'label' => Electro::translate('winter_day_energy'),
-                        'value' => 1000
+                        'value' => 800
                     ],
                     [
                         'label' => Electro::translate('other_time_energy'),
-                        'value' => 1000
+                        'value' => 1200
                     ]
                 ]
             ],
