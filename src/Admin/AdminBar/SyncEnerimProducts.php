@@ -6,6 +6,10 @@ class SyncEnerimProducts
 {
     public function handle($bar)
     {
+        if (! is_admin()) {
+            return;
+        }
+
         $screen = get_current_screen();
 
         if (! $screen || $screen->post_type != 'ec_product') {
