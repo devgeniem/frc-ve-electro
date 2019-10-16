@@ -39,11 +39,11 @@ class ProductPresenter extends Presenter
     // @todo: hack
     public function getPacketSubtitle() {
         if (strpos($this->description(), ' S') !== false ) {
-            return '<2000 kWh/v' . ' (' . $this->name . ')';
+            return '<2000 kWh/v';
         } else if (strpos($this->description(), ' M') !== false ) {
-            return '2000-3000 kWh/v' . ' (' . $this->name . ')';
+            return '2000-3000 kWh/v';
         }else if (strpos($this->description(), ' L') !== false ) {
-            return '3000-4000 kWh/v' . ' (' . $this->name . ')';
+            return '3000-4000 kWh/v';
         }
     }
 
