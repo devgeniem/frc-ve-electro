@@ -2,88 +2,91 @@
 
 namespace VE\Electro\Actions;
 
-use VE\Electro\EnerimCIS;
-use VE\Electro\Models\Product;
+use VE\Electro\EnerimCIS\EnerimAPI;
+use VE\Electro\Product\ProductRepository;
 
- // @TODO: Add logger
-
-class Products extends Action
+class Products
 {
+    public $action = 'electro/products';
+
+    protected $api;
+    protected $repository;
+
+    public function __construct()
+    {
+        $this->api = EnerimAPI::factory();
+        $this->repository = new ProductRepository;
+    }
+
     public function delete($ids = [])
     {
-        if ( $ids ) {
-            $products = Product::query([
-                'post_name__in' => $ids,
-            ]);
-        }
+        $this->repository->delete($ids);
 
-        if ( !$ids ) {
-            $products = Product::all();
-        }
-
-        foreach($products as $product) {
-            $product->delete();
-        }
+        do_action(
+            'electro/notice/success',
+            'Deleted products from database.'
+        );
     }
 
-    public function sync($ids = [])
+    public function sync()
     {
-        // @TODO: Separate sync to import and use sync method
-        // to run import and purge methods with same payload
+        try {
+            $response = $this->api->products()->toArray();
 
-        $client = new EnerimCIS\API\Client();
-        $response = $client->getProducts()->getBody();
+            if (empty($response)) {
+                return do_action(
+                    'electro/notice/success',
+                    'Nothing to import.'
+                );
+            }
 
-        foreach($response as $payload) {
-            $id = Product::updateOrCreate([
-                'post_title' => $payload['product_name'],
-                'post_status' => 'publish',
-                'meta_input' => [
-                    'payload' => $payload,
-                ],
-            ]);
+            do_action('electro/products/upload', $response);
+
+            $this->repository->purge($response);
+
+            do_action(
+                'electro/notice/success',
+                'Synchronized products from Enerim.'
+            );
+        } catch(\Exception $e) {
+            do_action('electro/log', $e->getMessage());
+            do_action('electro/notice/error', 'EnerimCIS API request failed.');
         }
-        // @TODO: Add support for single product imports
+        
     }
 
-    public function import(array $response = [])
+    public function import($ids = [])
     {
-        foreach($response as $payload) {
-            $id = Product::updateOrCreate([
-                'post_title' => $payload['product_name'],
-                'post_status' => 'publish',
-                'meta_input' => [
-                    'payload' => $payload,
-                ],
-            ]);
+        $response = array_map(function($id) {
+            return $this->api->product($id)->toArray();
+        }, $ids);
+    
+        if (! $response) {
+            return do_action(
+                'electro/notice/success',
+                'Nothing to import.'
+            );
         }
+
+        do_action('electro/products/upload', $response);
+
+        do_action(
+            'electro/notice/success',
+            'Imported products from Enerim.'
+        );
+
     }
 
-    public function purge()
+    public function upload($response)
     {
-        $client = new EnerimCIS\API\Client();
-        $response = $client->getProducts()->getBody();
+        $this->repository->import($response);
 
-        $productsFromAPI = collect($response)
-            ->pluck('product_name')
-            ->toArray();
+        $ids = wp_list_pluck($response, 'product_name');
 
-        $productsFromDB = Product::all();
+        do_action(
+            'electro/notice/info', 
+            sprintf('Imported products: %s.', join(', ', $ids))
+        );
 
-        $missing = $productsFromDB
-            ->map(function($product) {
-                return $product->post_title;
-            })
-            ->diff($productsFromAPI)
-            ->toArray();
-
-        $productsToDelete = $productsFromDB
-            ->filter(function($product) use($missing) {
-                return in_array($product->post_title, $missing);
-            });
-
-        foreach($productsToDelete as $product) {
-            $product->delete();
-        }
     }
 }
