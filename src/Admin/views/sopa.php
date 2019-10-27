@@ -1,31 +1,40 @@
 <div class="wrap">
+    <h1>
+        <?php _e('SOPA link generator'); ?>
+    </h1>
+
     <div id="poststuff">
         <div class="postbox">
             <div class="inside">
 
                 <div>
-                    <label for="selectedProductCode">Product name</label>
+                    <label style="width: 8em;display: inline-block;" for="selectedProductCode">Product name</label>
                     <input class="js-sopa-input" id="selectedProductCode" type="text">
                 </div>
 
                 <div style="margin-top:0.5em;">
-                    <label for="campaignCode">Campaign code</label>
+                    <label style="width: 8em;display: inline-block;" for="campaignCode">Campaign code</label>
                     <input class="js-sopa-input" id="campaignCode" type="text">
                 </div>
 
                 <div style="margin-top:0.5em;">
-                    <label for="brand">Bonus product?</label>
+                    <label style="width: 8em;display: inline-block;" for="brand">Bonus product?</label>
                     <input class="js-sopa-input" id="brand" value="SBonus" type="checkbox">
                 </div>
 
                 <div style="margin-top:1em;">
+                    URL: 
                     <a class="js-sopa-url"
-                        style="display:inline-block; font-family: monospace; padding: 0.5em; background-color: #f3f3f3;"
+                        style="display:inline-block; font-family: monospace; padding: 0.5em 0.75em; background-color: #f3f3f3;"
                         target="_blank"
                     >
                     URL
                     </a>
-                    <span class="js-sopa-copy button-primary">Copy</span>
+                </div>
+                <div style="margin-top:1em;">
+                    <span class="js-sopa-copy button-primary">
+                        <?= _e('Copy link'); ?>
+                    </span>
                 </div>
             </div>
         </div>
