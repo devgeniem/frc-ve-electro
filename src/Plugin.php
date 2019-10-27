@@ -105,7 +105,6 @@ class Plugin
     {
         $commands = [
             CLI\Products::class,
-            CLI\Debug::class,
         ];
 
         foreach($commands as $command) {
