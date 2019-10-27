@@ -271,7 +271,12 @@ class Model
 
     protected function updateOrCreate($attributes)
     {
-        $model = static::query($attributes)->first();
+        $attributesQuery = wp_parse_args([
+            'post_status' => ['any', 'trash'],
+            'meta_input' => [],
+        ], $attributes);
+
+        $model = static::query($attributesQuery)->first();
 
         if ( $model && $model->exists ) {
             return $model->update($attributes);
