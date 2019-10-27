@@ -1,14 +1,24 @@
 <?php
 
 namespace VE\Electro\CLI;
-
-use WP_CLI;
-
 class Products
 {
+    public $command = 'electro products';
+    
+    /**
+     * Sync (import + purge) all products from EneriemCIS API
+     */
+    public function sync()
+    {
+        do_action('electro/log', 'Starting sync.');
+
+        do_action('electro/products/sync');
+
+        do_action('electro/log', 'Finished sync.');
+    }
 
     /**
-     * Sync products from EneriemCIS API
+     * Import products from EneriemCIS API
      *
      * ## OPTIONS
      *
@@ -26,38 +36,52 @@ class Products
      *
      * $ wp electro products sync --id=ROS24PE1,ROS24PE2
      *
+     * @alias update
      */
-
-    public function sync($ids, $assoc_args)
+    public function import($ids, $assoc_args)
     {
+        do_action('electro/log', 'Starting import.');
+
         if (! empty($assoc_args['id'])) {
             $ids = explode(',', $assoc_args['id']);
         }
 
-        do_action('electro/products/sync', $ids);
+        do_action('electro/products/import', $ids);
+
+        do_action('electro/log', 'Finished import.');
     }
 
+    /**
+     * Delete all or defined products from WordPress database
+     *
+     * ## OPTIONS
+     *
+     * [<ID>...]
+     * : IDs of the products.
+     *
+     * [--id=<string>]
+     * : IDs of the products
+     *
+     * ## EXAMPLE
+     *
+     * $ wp electro products sync ROS24PE1 ROS24PE2
+     *
+     * or
+     *
+     * $ wp electro products sync --id=ROS24PE1,ROS24PE2
+     *
+     * @alias update
+     */
     public function delete($ids, $assoc_args)
     {
+        do_action('electro/log', 'Starting delete.');
+
         if (! empty($assoc_args['id'])) {
             $ids = explode(',', $assoc_args['id']);
         }
 
         do_action('electro/products/delete', $ids);
-    }
 
-    /**
-     *
-     * Purge products not in EneriemCIS API from WordPress
-     *
-     * ## EXAMPLES
-     *
-     * $ wp electro products purge
-     *
-     */
-    public function purge()
-    {
-
-        do_action('electro/products/purge');
+        do_action('electro/log', 'Finished delete.');
     }
 }
