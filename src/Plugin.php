@@ -4,18 +4,7 @@ namespace VE\Electro;
 
 class Plugin
 {
-
-    protected static $instance;
-
     protected $booted;
-
-    public static function singleton()
-    {
-        if (is_null(static::$instance)) {
-            static::$instance = new static();
-        }
-        return static::$instance;
-    }
 
     public function boot()
     {
@@ -28,13 +17,13 @@ class Plugin
         $this->booted = true;
     }
 
-    public function registerHooks()
+    protected function registerHooks()
     {
         add_action('init', [$this, 'registerActions']);
         add_action('init', [$this, 'registerModels']);
         add_action('init', [$this, 'registerAdmin']);
         add_action('cli_init', [$this, 'registerConsoleCommands']);
-        
+
         // Add Polylang support
         add_filter('pll_get_post_types', function($post_types, $is_settings ) {
             if ( $is_settings ) {
@@ -104,6 +93,7 @@ class Plugin
     public function registerConsoleCommands()
     {
         $commands = [
+            CLI\Ping::class,
             CLI\Products::class,
         ];
 
