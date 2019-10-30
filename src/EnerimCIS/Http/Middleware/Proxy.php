@@ -1,6 +1,6 @@
 <?php
 
-namespace VE\Electro\EnerimCIS\API\Middlewares;
+namespace VE\Electro\EnerimCIS\Http\Middleware;
 
 class Proxy
 {

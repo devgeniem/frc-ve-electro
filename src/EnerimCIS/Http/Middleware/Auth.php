@@ -1,14 +1,16 @@
 <?php
 
-namespace VE\Electro\EnerimCIS\API\Middlewares;
+namespace VE\Electro\EnerimCIS\Http\Middleware;
+
+use Exception;
 
 class Auth
 {
     protected $key;
-    
+
     protected $cert;
 
-    public function __construct($key, $cert) 
+    public function __construct($key, $cert)
     {
         $this->key = $key;
         $this->cert = $cert;
@@ -16,6 +18,10 @@ class Auth
 
     public function handle($handle)
     {
+        if (! $this->key || ! $this->cert) {
+            throw new Exception('EnerimCIS API auth key or cert is missing.');
+        }
+
         curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, 0);
 
@@ -31,10 +37,6 @@ class Auth
     protected function writeToFile($file, $content)
     {
         $path = trailingslashit(sys_get_temp_dir()). $file;
-
-        if (file_exists($path)) {
-            return $path;
-        }
 
         $resource = fopen($path, 'w');
         $content = str_replace('\n', "\n", $content);

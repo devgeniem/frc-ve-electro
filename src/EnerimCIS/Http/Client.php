@@ -1,6 +1,6 @@
 <?php
 
-namespace VE\Electro\EnerimCIS\API;
+namespace VE\Electro\EnerimCIS\Http;
 
 use Exception;
 use VE\Electro\Support\Str;
@@ -21,9 +21,10 @@ class Client
 
         $this->client = new WP_Http_Curl();
 
-        $this->middlewares[] = new Middlewares\Auth($key, $cert);
+        $this->middlewares[] = new Middleware\Auth($key, $cert);
+
         if ($proxyUrl) {
-            $this->middlewares[] = new Middlewares\Proxy($proxyUrl);
+            $this->middlewares[] = new Middleware\Proxy($proxyUrl);
         }
     }
 
@@ -110,51 +111,5 @@ class Client
         }
 
         return $this->request($method, ...$args);
-    }
-
-    /**
-     * @param array $args
-     *
-     * @return array|Response|WP_Error
-     * @throws Exception
-     */
-    public function getProducts($args = []) {
-
-        $urlPath = 'products/';
-        $defaults = [
-            'partyId'         => 'VE',
-            'dynamicProperty' => 'ContractChannel_Verkkosivut'
-        ];
-        $args = wp_parse_args($args, $defaults);
-        $path = add_query_arg($args, $urlPath);
-
-        return $this->get($path);
-    }
-
-    /**
-     * @param array $args
-     *
-     * @return array|Response|WP_Error
-     * @throws Exception
-     */
-    public function getProduct($id) {
-
-        $urlPath = sprintf('products/%s', $id);
-        $args = [
-            'partyId'         => 'VE',
-            'dynamicProperty' => 'ContractChannel_Verkkosivut'
-        ];
-        $path = add_query_arg($args, $urlPath);
-
-        return $this->get($path);
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getProductsTest()
-    {
-        $uri = home_url('ContractChannel_Verkkosivut.json');
-        return $this->get($uri);
     }
 }

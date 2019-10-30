@@ -1,6 +1,6 @@
 <?php
 
-namespace VE\Electro\EnerimCIS\API;
+namespace VE\Electro\EnerimCIS\Http;
 
 class Response
 {

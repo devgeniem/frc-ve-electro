@@ -8,7 +8,7 @@ class EnerimAPI
 
     public function __construct($key, $cert, $proxy)
     {
-        $this->client = new API\Client($key, $cert, $proxy);
+        $this->client = new Http\Client($key, $cert, $proxy);
     }
 
     public static function factory()
@@ -20,7 +20,7 @@ class EnerimAPI
         );
     }
 
-    public function products($ids = [])
+    public function products()
     {
         $endpoint = '/products';
 
