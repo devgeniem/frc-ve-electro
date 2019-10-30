@@ -22,71 +22,67 @@ class Products
     {
         $this->repository->delete($ids);
 
-        do_action(
-            'electro/notice/success',
-            'Deleted products from database.'
-        );
+        do_action('electro/notice/success', 'Deleted products from database.');
     }
 
     public function sync()
     {
         try {
             $response = $this->api->products()->toArray();
-
-            if (empty($response)) {
-                return do_action(
-                    'electro/notice/success',
-                    'Nothing to import.'
-                );
-            }
-
-            do_action('electro/products/upload', $response);
-
-            $this->repository->purge($response);
-
-            do_action(
-                'electro/notice/success',
-                'Synchronized products from Enerim.'
-            );
         } catch(\Exception $e) {
             do_action('electro/log', $e->getMessage());
             do_action('electro/notice/error', 'EnerimCIS API request failed.');
+            return;
         }
-        
+
+        do_action('electro/products/save', $response);
+        do_action('electro/products/purge', $response);
+
+        do_action('electro/notice/success', 'Synchronized products from Enerim.');
     }
 
     public function import($ids = [])
     {
-        $response = array_map(function($id) {
-            return $this->api->product($id)->toArray();
-        }, $ids);
-    
-        if (! $response) {
-            return do_action(
-                'electro/notice/success',
-                'Nothing to import.'
-            );
+        try {
+            $response = array_map(function($id) {
+                return $this->api->product($id)->toArray();
+            }, $ids);
+        } catch(\Exception $e) {
+            do_action('electro/log', $e->getMessage());
+            do_action('electro/notice/error', 'EnerimCIS API request failed.');
+            return;
         }
 
-        do_action('electro/products/upload', $response);
+        do_action('electro/products/save', $response);
 
-        do_action(
-            'electro/notice/success',
-            'Imported products from Enerim.'
-        );
-
+        do_action('electro/notice/success', 'Imported product(s) from Enerim.');
     }
 
-    public function upload($response)
+    public function save($response)
     {
-        $this->repository->import($response);
+        $imported = $this->repository->import($response);
 
-        $ids = wp_list_pluck($response, 'product_name');
+        if (! $imported) {
+            return do_action('electro/notice/success', 'Nothing to import.');
+        }
 
         do_action(
-            'electro/notice/info', 
-            sprintf('Imported products: %s.', join(', ', $ids))
+            'electro/notice/info',
+            sprintf('Imported or updated product(s): %s.', join(', ', $imported))
         );
+    }
 
+    public function purge($response)
+    {
+        $purged = $this->repository->purge($response);
+
+        if (! $purged) {
+            return do_action('electro/notice/info', 'Nothing to purge.');
+        }
+
+        do_action(
+            'electro/notice/info',
+            sprintf('Purged product(s): %s.', join(', ', $purged))
+        );
     }
 }

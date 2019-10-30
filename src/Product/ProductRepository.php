@@ -85,6 +85,8 @@ class ProductRepository
 
     public static function purge($response)
     {
+        $purged = [];
+
         $productsFromAPI = collect($response)
             ->pluck('product_name')
             ->toArray();
@@ -105,7 +107,10 @@ class ProductRepository
 
         foreach($productsToDelete as $product) {
             $product->trash();
+            $purged[] = $product->post_title;
         }
+
+        return $purged;
     }
 
     public function __call($name, $arguments)
