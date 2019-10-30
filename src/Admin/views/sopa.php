@@ -23,7 +23,7 @@
                 </div>
 
                 <div style="margin-top:1em;">
-                    URL: 
+                    URL:
                     <a class="js-sopa-url"
                         style="display:inline-block; font-family: monospace; padding: 0.5em 0.75em; background-color: #f3f3f3;"
                         target="_blank"

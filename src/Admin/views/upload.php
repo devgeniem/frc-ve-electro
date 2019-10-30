@@ -8,9 +8,9 @@
         <div class="postbox">
             <div class="inside">
 
-                <form 
-                    action="<?= esc_url(admin_url('admin-post.php')); ?>" 
-                    method="POST" 
+                <form
+                    action="<?= esc_url(admin_url('admin-post.php')); ?>"
+                    method="POST"
                     enctype="multipart/form-data"
                 >
                     <?php wp_nonce_field('enerim_json_upload'); ?>
