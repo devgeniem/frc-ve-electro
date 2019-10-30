@@ -1,10 +1,11 @@
 <?php
 
 namespace VE\Electro\CLI;
+
 class Products
 {
     public $command = 'electro products';
-    
+
     /**
      * Sync (import + purge) all products from EneriemCIS API
      */

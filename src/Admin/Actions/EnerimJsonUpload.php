@@ -21,14 +21,14 @@ class EnerimJsonUpload
             $data = null;
 
             do_action(
-                'electro/notice/error', 
+                'electro/notice/error',
                 'Import failed: file is not valid.',
             );
         }
-    
-        
+
+
         if ($data) {
-            do_action('electro/products/upload', $data);
+            do_action('electro/products/save', $data);
 
             do_action(
                 'electro/notice/success',
@@ -38,5 +38,5 @@ class EnerimJsonUpload
 
         wp_safe_redirect(wp_get_referer());
     }
-    
+
 }
