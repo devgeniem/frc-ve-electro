@@ -93,7 +93,6 @@ class Plugin
     public function registerConsoleCommands()
     {
         $commands = [
-            CLI\Ping::class,
             CLI\Products::class,
         ];
 
