@@ -21,7 +21,7 @@ class Plugin
     {
         add_action('init', [$this, 'registerActions']);
         add_action('init', [$this, 'registerModels']);
-        add_action('init', [$this, 'registerAdmin']);
+        add_action('init', [$this, 'registerAdmin'], 1);
         add_action('cli_init', [$this, 'registerConsoleCommands']);
 
         // Add Polylang support
