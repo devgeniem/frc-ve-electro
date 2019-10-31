@@ -2,10 +2,10 @@
 namespace VE\Electro\Admin\Acf;
 
 class ProductGroupFields extends Field
-{    
+{
     public function register()
     {
-        
+
         $field_products = [
             'key' => $this->field('ec_products'),
             'name' => 'ec_products',
@@ -125,7 +125,7 @@ class ProductGroupFields extends Field
                 ]
             ]
         ];
-        
+
         acf_add_local_field_group($group);
     }
 }

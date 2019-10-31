@@ -1,14 +1,23 @@
 <?php
 
-namespace VE\Electro\EnerimCIS\API;
+namespace VE\Electro\EnerimCIS\Http;
 
 class Response
 {
     protected $response;
 
+    protected $data;
+
     public function __construct($response)
     {
         $this->response = $response;
+
+        $this->data = $this->getBody();
+    }
+
+    public function toArray()
+    {
+        return json_decode(json_encode($this->data), true);
     }
 
     public function getBody()

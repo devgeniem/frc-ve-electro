@@ -10,6 +10,6 @@ class EnerimSyncProducts
 
         do_action('electro/products/sync');
 
-        wp_safe_redirect( wp_get_referer() );
+        wp_safe_redirect(wp_get_referer());
     }
 }

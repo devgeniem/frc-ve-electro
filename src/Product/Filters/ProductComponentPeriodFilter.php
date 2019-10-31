@@ -32,7 +32,7 @@ class ProductComponentPeriodFilter
 
     public function active()
     {
-        // @TODO: Get period of relevant to user.
+        // Get relevant period.
         // E.g. show next period already 14 days before valid_from date.
         $next = Carbon::now()->addDays(
             $this->context->nextDaysPrior()

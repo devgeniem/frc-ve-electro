@@ -2,54 +2,50 @@
 
 namespace VE\Electro;
 
-use VE\Electro\Support\Str;
-use Carbon\Carbon;
-
 class Plugin
 {
-    public const NAMESPACE = 'electro';
+    protected $booted;
 
-    public static function boot()
+    public function boot()
     {
-        static::load();
-        Admin\Admin::load();
+        if ($this->booted) {
+            return;
+        }
+
+        $this->registerHooks();
+
+        $this->booted = true;
     }
 
-    public static function load()
+    protected function registerHooks()
     {
-        add_action('init', [__CLASS__, 'actions_init']);
+        add_action('init', [$this, 'registerActions']);
+        add_action('init', [$this, 'registerModels']);
+        add_action('init', [$this, 'registerAdmin'], 1);
+        add_action('cli_init', [$this, 'registerConsoleCommands']);
 
-        add_action('cli_init', [__CLASS__, 'cli_init']);
-
-        add_action('init', [__CLASS__, 'models_init']);
-        add_action('acf/init', [__CLASS__, 'acf_init']);
-
-        // @TOOD: Move code
-        add_filter('pll_get_post_types', function( $post_types, $is_settings ) {
+        // Add Polylang support
+        add_filter('pll_get_post_types', function($post_types, $is_settings ) {
             if ( $is_settings ) {
-                // hides 'my_cpt' from the list of custom post types in Polylang settings
                 unset( $post_types['product_group'] );
             } else {
-                // enables language and translation management for 'my_cpt'
                 $post_types['product_group'] = 'product_group';
             }
             return $post_types;
-        }, 10, 2 );
+        }, 10, 2);
 
     }
 
-    public static function acf_init()
+    public function registerAdmin()
     {
-        $fields = [
-            Admin\Acf\ProductGroupFields::class,
-        ];
-
-        foreach($fields as $field) {
-            (new $field)->register();
+        if (! is_admin()) {
+            return;
         }
+
+        (new Admin\Admin)->registerHooks();
     }
 
-    public static function models_init()
+    public function registerModels()
     {
         $models = [
             Models\Product::class,
@@ -61,18 +57,16 @@ class Plugin
         }
     }
 
-    public static function actions_init()
+    public function registerActions()
     {
-        $actionNamespace = static::NAMESPACE;
-
         $actions = [
-            'products',
+            Actions\Log::class,
+            Actions\Notice::class,
+            Actions\Products::class,
         ];
 
-        foreach($actions as $actionName) {
+        foreach($actions as $class) {
             // Get public methods from correspond action class
-            $class = __NAMESPACE__ . '\\Actions\\' . Str::studly($actionName);
-
             $reflection = new \ReflectionClass($class);
 
             $methods = $reflection->getMethods(\ReflectionMethod::IS_PUBLIC);
@@ -80,31 +74,31 @@ class Plugin
                 return !$method->isStatic();
             });
 
+            $instance = new $class;
+
             foreach($methods as $method) {
                 // By default action calls static handle method which finds right method
                 // based on action name.
                 // Callable as `do_action('electro/action/method', $params);`.
-                add_action("{$actionNamespace}/{$actionName}/{$method->name}", [
-                    $class, 'handle',
-                ]);
+                $action = "{$instance->action}/{$method->name}";
+                if ($method->name === 'handle') {
+                    $action = $instance->action;
+                }
+
+                add_action($action, [$instance, $method->name]);
             }
         }
     }
 
-    public static function cli_init()
+    public function registerConsoleCommands()
     {
-        $commandNamespace = static::NAMESPACE;
-
         $commands = [
-            'debug',
-            'products',
+            CLI\Products::class,
         ];
 
         foreach($commands as $command) {
-            $class = __NAMESPACE__ . '\\CLI\\' . Str::studly($command);
-            if ( class_exists($class) ) {
-                \WP_CLI::add_command("$commandNamespace $command", $class);
-            }
+            $instance = new $command;
+            \WP_CLI::add_command($instance->command, $instance);
         }
     }
 }

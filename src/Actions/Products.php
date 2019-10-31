@@ -2,88 +2,87 @@
 
 namespace VE\Electro\Actions;
 
-use VE\Electro\EnerimCIS;
-use VE\Electro\Models\Product;
+use VE\Electro\EnerimCIS\EnerimAPI;
+use VE\Electro\Product\ProductRepository;
 
- // @TODO: Add logger
-
-class Products extends Action
+class Products
 {
+    public $action = 'electro/products';
+
+    protected $api;
+    protected $repository;
+
+    public function __construct()
+    {
+        $this->api = EnerimAPI::factory();
+        $this->repository = new ProductRepository;
+    }
+
     public function delete($ids = [])
     {
-        if ( $ids ) {
-            $products = Product::query([
-                'post_name__in' => $ids,
-            ]);
-        }
+        $this->repository->delete($ids);
 
-        if ( !$ids ) {
-            $products = Product::all();
-        }
-
-        foreach($products as $product) {
-            $product->delete();
-        }
+        do_action('electro/notice/success', 'Deleted products from database.');
     }
 
-    public function sync($ids = [])
+    public function sync()
     {
-        // @TODO: Separate sync to import and use sync method
-        // to run import and purge methods with same payload
-
-        $client = new EnerimCIS\API\Client();
-        $response = $client->getProducts()->getBody();
-
-        foreach($response as $payload) {
-            $id = Product::updateOrCreate([
-                'post_title' => $payload['product_name'],
-                'post_status' => 'publish',
-                'meta_input' => [
-                    'payload' => $payload,
-                ],
-            ]);
+        try {
+            $response = $this->api->products()->toArray();
+        } catch(\Exception $e) {
+            do_action('electro/log', $e->getMessage());
+            do_action('electro/notice/error', 'EnerimCIS API request failed.');
+            return;
         }
-        // @TODO: Add support for single product imports
+
+        do_action('electro/products/save', $response);
+        do_action('electro/products/purge', $response);
+
+        do_action('electro/notice/success', 'Synchronized products from Enerim.');
     }
 
-    public function import(array $response = [])
+    public function import($ids = [])
     {
-        foreach($response as $payload) {
-            $id = Product::updateOrCreate([
-                'post_title' => $payload['product_name'],
-                'post_status' => 'publish',
-                'meta_input' => [
-                    'payload' => $payload,
-                ],
-            ]);
+        try {
+            $response = array_map(function($id) {
+                return $this->api->product($id)->toArray();
+            }, $ids);
+        } catch(\Exception $e) {
+            do_action('electro/log', $e->getMessage());
+            do_action('electro/notice/error', 'EnerimCIS API request failed.');
+            return;
         }
+
+        do_action('electro/products/save', $response);
+
+        do_action('electro/notice/success', 'Imported product(s) from Enerim.');
     }
 
-    public function purge()
+    public function save($response)
     {
-        $client = new EnerimCIS\API\Client();
-        $response = $client->getProducts()->getBody();
+        $imported = $this->repository->import($response);
 
-        $productsFromAPI = collect($response)
-            ->pluck('product_name')
-            ->toArray();
-
-        $productsFromDB = Product::all();
-
-        $missing = $productsFromDB
-            ->map(function($product) {
-                return $product->post_title;
-            })
-            ->diff($productsFromAPI)
-            ->toArray();
-
-        $productsToDelete = $productsFromDB
-            ->filter(function($product) use($missing) {
-                return in_array($product->post_title, $missing);
-            });
-
-        foreach($productsToDelete as $product) {
-            $product->delete();
+        if (! $imported) {
+            return do_action('electro/notice/success', 'Nothing to import.');
         }
+
+        do_action(
+            'electro/notice/info',
+            sprintf('Imported or updated product(s): %s.', join(', ', $imported))
+        );
+    }
+
+    public function purge($response)
+    {
+        $purged = $this->repository->purge($response);
+
+        if (! $purged) {
+            return do_action('electro/notice/info', 'Nothing to purge.');
+        }
+
+        do_action(
+            'electro/notice/info',
+            sprintf('Purged product(s): %s.', join(', ', $purged))
+        );
     }
 }

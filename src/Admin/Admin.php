@@ -4,13 +4,12 @@ namespace VE\Electro\Admin;
 
 class Admin
 {
-    public static function load()
+    public function registerHooks()
     {
-        add_action('add_meta_boxes', [__CLASS__, 'add_meta_boxes']);
-        add_action('acf/init', [__CLASS__, 'add_settings_menu']);
-        add_action('admin_menu', [__CLASS__, 'add_upload_page']);
-        add_action('admin_menu', [__CLASS__, 'add_sopa_page']);
-        add_action('admin_post_enerim_json_upload', [__CLASS__, 'action_enerim_json_upload']);
+        add_action('acf/init', [$this, 'acf_init']);
+        add_action('add_meta_boxes', [$this, 'add_meta_boxes']);
+        add_action('admin_menu', [$this, 'add_upload_page']);
+        add_action('admin_menu', [$this, 'add_sopa_page']);
 
         add_action(
             'manage_ec_product_posts_custom_column',
@@ -31,35 +30,19 @@ class Admin
             'admin_post_enerim_sync_products',
             [new Actions\EnerimSyncProducts, 'handle']
         );
+
+        add_action(
+            'admin_post_enerim_json_upload',
+            [new Actions\EnerimJsonUpload, 'handle']
+        );
+
+        add_action(
+            'admin_notices',
+            [new Notices\Notices, 'handle']
+        );
     }
 
-    public static function action_enerim_json_upload()
-    {
-        $data = [];
-
-        // @TOOD: Sanitize and validate
-        if(isset($_FILES['file'])){
-            $file = $_FILES['file']['tmp_name'];
-            $data = file_get_contents($file);
-            $data = json_decode($data, true);
-        }
-
-        do_action('electro/products/import', $data);
-
-        wp_safe_redirect( wp_get_referer() );
-    }
-
-    public static function add_settings_menu()
-    {
-        acf_add_options_page([
-            'page_title' => __('Settings'),
-            'menu_title' => __('Settings'),
-            'menu_slug' => 'enerimcis-settings',
-            'parent_slug' => 'edit.php?post_type=ec_product',
-        ]);
-    }
-
-    public static function add_upload_page()
+    public function add_upload_page()
     {
         add_submenu_page(
             'edit.php?post_type=ec_product',
@@ -73,12 +56,12 @@ class Admin
         );
     }
 
-    public static function add_sopa_page()
+    public function add_sopa_page()
     {
         add_submenu_page(
             'edit.php?post_type=ec_product',
-            __('SOPA-link'),
-            __('SOPA-link'),
+            __('SOPA link generator'),
+            __('SOPA link generator'),
             'manage_options',
             'sopa-link',
             function() {
@@ -87,7 +70,18 @@ class Admin
         );
     }
 
-    public static function add_meta_boxes()
+    public function acf_init()
+    {
+        $fields = [
+            Acf\ProductGroupFields::class,
+        ];
+
+        foreach($fields as $field) {
+            (new $field)->register();
+        }
+    }
+
+    public function add_meta_boxes()
     {
         add_meta_box(
             'ec_product_card',

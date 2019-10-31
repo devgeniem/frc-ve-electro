@@ -4,6 +4,8 @@ namespace VE\Electro\ProductGroup;
 
 use VE\Electro\Presenters;
 use VE\Electro\EnerimCIS\Code;
+use VE\Electro\Models\Product;
+use VE\Electro\Product\ProductRepository;
 
 class ProductGroup
 {
@@ -22,7 +24,11 @@ class ProductGroup
         $args = wp_parse_args($args, $defaults);
         $this->args = $args;
 
-        $this->products = $this->model->products;
+        $this->products = $this->model->products->filter();
+
+        if (! $this->products->count()) {
+            $this->products->push(ProductRepository::factory(new Product));
+        }
 
         if ($args) {
             $this->products = $this->products->map(function($product) use($args) {
@@ -40,7 +46,7 @@ class ProductGroup
 
     protected function referenceProduct()
     {
-        return $this->model->products->first();
+        return $this->products->first();
     }
 
     public function getType()
