@@ -73,6 +73,9 @@ class Client
 
         foreach($this->middlewares as $middleware) {
             remove_action('http_api_curl', [$middleware, 'handle']);
+            if (method_exists($middleware, 'tearDown')) {
+                $middleware->tearDown();
+            }
         }
 
         if (is_wp_error($response)) {

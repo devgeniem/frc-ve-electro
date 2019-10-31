@@ -10,6 +10,8 @@ class Auth
 
     protected $cert;
 
+    protected $tempFiles = [];
+
     public function __construct($key, $cert)
     {
         $this->key = $key;
@@ -34,6 +36,13 @@ class Auth
         curl_setopt($handle, CURLOPT_SSLCERT, $certFile);
     }
 
+    public function tearDown()
+    {
+        foreach($this->tempFiles as $file) {
+            unlink($file);
+        }
+    }
+
     protected function writeToFile($file, $content)
     {
         $path = trailingslashit(sys_get_temp_dir()). $file;
@@ -41,6 +50,8 @@ class Auth
         $resource = fopen($path, 'w');
         $content = str_replace('\n', "\n", $content);
         fwrite($resource, $content);
+
+        $this->tempFiles[] = $path;
 
         return $path;
     }
