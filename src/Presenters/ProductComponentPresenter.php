@@ -12,7 +12,7 @@ class ProductComponentPresenter extends Presenter
             return $this->entity->getDescription();
         }
         $unit = Electro::translate($this->entity->get('price_valid_duration_unit'));
-        return $this->entity->getDescription() . ' ' . $this->entity->get('price_valid_duration') . ' ' . $unit;
+        return $this->entity->getDescription() . ' ' . $this->entity->get('price_valid_duration') . '. ' . $unit;
     }
 
     protected function price()
