@@ -68,7 +68,8 @@ class Product extends Model
             })
             ->pluck('component_prices')
             ->collapse()
-            ->sortBy('sort_order');
+            ->sortBy('sort_order')
+            ->sortBy('price_valid_period');
 
         // $prices = $this->mutateComponents($prices);
 

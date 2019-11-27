@@ -2,11 +2,17 @@
 
 namespace VE\Electro\Presenters;
 
+use VE\Electro\Electro;
+
 class ProductComponentPresenter extends Presenter
 {
     protected function description()
     {
-        return $this->entity->getDescription();
+        if ($this->entity->get('price_valid_duration') == 0) {
+            return $this->entity->getDescription();
+        }
+        $unit = Electro::translate($this->entity->get('price_valid_duration_unit'));
+        return $this->entity->getDescription() . ' ' . $this->entity->get('price_valid_duration') . ' ' . $unit;
     }
 
     protected function price()
