@@ -1,6 +1,6 @@
 <div class="wrap">
     <h1>
-        <?php _e('SOPA link generator'); ?>
+        <?php _e('SOPA link generator', 'electro'); ?>
     </h1>
 
     <div id="poststuff">
@@ -17,11 +17,6 @@
                     <input class="js-sopa-input" id="campaignCode" type="text">
                 </div>
 
-                <div style="margin-top:0.5em;">
-                    <label style="width: 8em;display: inline-block;" for="brand">Bonus product?</label>
-                    <input class="js-sopa-input" id="brand" value="SBonus" type="checkbox">
-                </div>
-
                 <div style="margin-top:1em;">
                     URL:
                     <a class="js-sopa-url"
@@ -33,7 +28,7 @@
                 </div>
                 <div style="margin-top:1em;">
                     <span class="js-sopa-copy button-primary">
-                        <?= _e('Copy link'); ?>
+                        <?= _e('Copy link', 'electro'); ?>
                     </span>
                 </div>
             </div>

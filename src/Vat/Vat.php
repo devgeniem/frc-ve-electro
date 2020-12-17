@@ -11,14 +11,14 @@ class Vat
         $this->rate = $rate;
     }
 
-    public function getRate()
+    public function rate()
     {
         return $this->rate;
     }
 
     public function ratio()
     {
-        return 1 + ($this->getRate() / 100);
+        return 1 + ($this->rate() / 100);
     }
 
     public function addTo($money)

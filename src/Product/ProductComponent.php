@@ -2,90 +2,102 @@
 
 namespace VE\Electro\Product;
 
-use Carbon\Carbon;
-use VE\Electro\Electro;
-use VE\Electro\Presenters\ProductComponentPresenter;
+use Illuminate\Support\Str;
 use VE\Electro\Product\Collections\PayloadCollection;
+use VE\Electro\Product\Enums\FeeType;
 
-class ProductComponent extends PayloadCollection
+class ProductComponent
 {
-    public function getName()
+    protected $payload;
+
+    protected $product;
+
+    public function __construct(PayloadCollection $payload, Product $product)
     {
-        return $this->get('component_name');
+        $this->payload = $payload;
+
+        $this->product = $product;
     }
 
-    public function getDescription()
+    public function id()
     {
-        $items = collect($this->items)->recursive();
+        return $this->payload->get('component_name');
+    }
 
-        return $items->get('product_component_descriptions')
-            ->where('language', Electro::langId()) // @TODO
+    public function description($lang = true)
+    {
+        return $this->payload->get('product_component_descriptions')
+            ->where('language', $lang)
             ->first()
             ->get('description');
     }
 
-    public function getMeteringUnit()
+    public function calculationKey()
     {
-        $value = $this->get('tariff_id');
+        return $this->payload->get('time_period_model_key') ?? 'month';
+    }
 
-        // @TODO
-        if ( $value === 144002 ) {
-            return Electro::translate('month');
+    public function sortOrder()
+    {
+        return $this->payload->get('sort_order');
+    }
+
+    public function type()
+    {
+        return $this->product->componentType($this);
+    }
+
+    public function feeType()
+    {
+        if (Str::endsWith($this->id(), '-PM')) {
+            return FeeType::MONTHLY;
         }
 
-        return 'kWh';
+        if (Str::endsWith($this->id(), '-KM')) {
+            return FeeType::MONTHLY;
+        }
+
+        if (Str::endsWith($this->id(), '-MG')) {
+            return FeeType::MARGINAL;
+        }
+
+        if (Str::endsWith($this->id(), '-KA')) {
+            return FeeType::DISCOUNT;
+        }
+
+        return FeeType::ENERGY;
     }
 
-    public function price(array $args = [])
+    public function isFeeType($type)
     {
-        $defaults = [
-            'amount' => $this->get('unit_price'),
-            'currency' => $this->get('currency'),
-            'vat' => $this->get('vat_rate'),
-            'withVat' => true,
-            'decimals' => $this->get('price_decimals'),
-            'perUnit' => $this->getMeteringUnit(),
-        ];
-
-        $args = wp_parse_args($args, $defaults);
-
-        return new Price($args);
+        return $this->feeType() === $type;
     }
 
-
-    public function isCurrent()
+    public function isDiscount()
     {
-        $now = Carbon::now();
-        $from = $this->get('valid_from');
-        $to = $this->get('valid_to');
-        return $now->greaterThanOrEqualTo($from) && $now->lessThan($to);
+        return $this->isFeeType(FeeType::DISCOUNT);
     }
 
-    public function isActive()
+    public function prices()
     {
-        $now = Carbon::now();
-        $from = $this->get('valid_from')->subDays(14);
-        $to = $this->get('valid_to');
-        return $now->greaterThanOrEqualTo($from) && $now->lessThan($to);
+        return $this->payload->get('component_prices')
+            ->map(function($payload) {
+                return new ProductPrice($payload, $this, $this->product);
+            });
     }
 
-    public function isPrev()
+    public function tariffId()
     {
-        $now = Carbon::now();
-        $to = $this->get('valid_to');
-        return $now->greaterThanOrEqualTo($to);
+        return $this->payload->get('tariff_id');
     }
 
-    public function isNext()
+    public function priceDecimals()
     {
-        $now = Carbon::now();
-        $from = $this->get('valid_from');
-        return $from->greaterThanOrEqualTo($now);
+        return $this->payload->get('price_decimals');
     }
 
-    public function present()
+    public function meta()
     {
-        return new ProductComponentPresenter($this);
+        return $this->product->componentMeta($this);
     }
-
 }

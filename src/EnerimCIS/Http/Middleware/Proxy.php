@@ -21,5 +21,4 @@ class Proxy
         curl_setopt($handle, CURLOPT_PROXYAUTH, CURLAUTH_BASIC);
         curl_setopt($handle, CURLOPT_PROXYUSERPWD, $proxyauth);
     }
-
 }

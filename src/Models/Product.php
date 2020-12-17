@@ -3,9 +3,6 @@
 namespace VE\Electro\Models;
 
 use VE\Electro\WordPress\Model;
-use VE\Electro\Product\PayloadCollection;
-use VE\Electro\Product\ComponentCollection;
-use VE\Electro\Product\Component;
 
 class Product extends Model
 {
@@ -19,62 +16,8 @@ class Product extends Model
         'name' => 'Enerim Products',
     ];
 
-    protected $payloadMutated;
-    protected $componentsMutated;
-
-
-    /**
-     * Attribute mutator getters
-     */
-
-    protected function getPayloadAttribute($value)
-    {
-        if ($this->payloadMutated) {
-            return $this->payloadMutated;
-        }
-
-        return $this->payloadMutated = $this->payloadCollection
-            ->put('product_components', $this->components);
-    }
-
-    protected function getPayloadCollectionAttribute($value)
+    public function payload()
     {
         return collect($this->meta->payload)->recursive();
-    }
-
-    protected function getComponentsAttribute($value)
-    {
-        if ($this->componentsMutated) {
-            return $this->componentsMutated;
-        }
-
-        return $this->componentsMutated = $this->payloadCollection
-            ->get('product_components', collect([]))
-            ->map(function($component) {
-                // Merge component_prices and single product_components item
-                // to get flat data model for product_components
-                $merged = $component
-                    ->get('component_prices')
-                    ->map(function($price) use($component) {
-                        return $price
-                            ->merge($component)
-                            ->forget('component_prices');
-                    });
-
-                // Replace component_prices with merged data
-                $component->put('component_prices', $merged);
-
-                return $component;
-            })
-            ->pluck('component_prices')
-            ->collapse()
-            ->sortBy('sort_order')
-            ->sortBy('price_valid_period');
-
-        // $prices = $this->mutateComponents($prices);
-
-        // Map component_prices items to be Component objects
-        return $this->componentsMutated =
-            (new ComponentCollection($prices))->mapInto(Component::class);
     }
 }

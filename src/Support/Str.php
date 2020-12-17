@@ -2,12 +2,10 @@
 
 namespace VE\Electro\Support;
 
-use VE\Electro\Support\Traits\Macroable;
+use Tightenco\Collect\Support\Arr;
 
 class Str
 {
-    use Macroable;
-
     /**
      * The cache of snake-cased words.
      *

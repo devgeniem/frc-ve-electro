@@ -2,54 +2,27 @@
 
 namespace VE\Electro\Product;
 
-use VE\Electro\EnerimCIS\Code;
 use VE\Electro\Models\Product as ProductModel;
-use VE\Electro\EnerimCIS;
 
 class ProductRepository
 {
-    public static function factory($model)
+    protected function get(int $id)
     {
-        $context = new Context\Standard();
-
-        if ( $model->payload->get('product_group') === Code::GROUP_PACKAGE ) {
-            $context = new Context\Package();
-        }
-
-        elseif ( $model->payload->get('protection_method') === Code::TYPE_TEMPORARY ) {
-            $context = new Context\Temporary();
-        }
-
-        elseif ( $model->payload->get('protection_method') === Code::TYPE_TARIFF ) {
-            $context = new Context\Tariff();
-        }
-
-        elseif ( $model->payload->get('protection_method') === Code::TYPE_SPOT ) {
-            $context = new Context\Spot();
-        }
-
-        return new Product($model, $context);
-    }
-
-    public static function get(int $id)
-    {
-        return static::query([
+        return $this->query([
             'p' => $id,
         ])->first();
     }
 
-    public static function query(array $args = [])
+    protected function query(array $args = [])
     {
         $results = ProductModel::query($args);
 
-        $results = $results->map(function($item) {
-            return static::factory($item);
+        return $results->map(function(ProductModel $model) {
+            return Factory::product($model->payload());
         });
-
-        return $results;
     }
 
-    public static function delete($ids = [])
+    public function delete($ids = [])
     {
         if ($ids) {
             $products = ProductModel::query([
@@ -66,7 +39,7 @@ class ProductRepository
         }
     }
 
-    public static function import($response)
+    public function import($response)
     {
         $imported = [];
         foreach($response as $payload) {
@@ -83,7 +56,7 @@ class ProductRepository
         return $imported;
     }
 
-    public static function purge($response)
+    public function purge($response)
     {
         $purged = [];
 
@@ -113,8 +86,8 @@ class ProductRepository
         return $purged;
     }
 
-    public function __call($name, $arguments)
+    public static function __callStatic($method, $parameters)
     {
-        return static::$name(...$arguments);
+        return (new static)->$method(...$parameters);
     }
 }

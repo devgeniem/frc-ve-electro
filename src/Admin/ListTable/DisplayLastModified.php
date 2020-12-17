@@ -4,7 +4,20 @@ namespace VE\Electro\Admin\ListTable;
 
 class DisplayLastModified
 {
-    public function handle($column, $post_id)
+    public function register()
+    {
+        add_action('manage_ec_product_posts_columns', [$this, 'addTitle']);
+        add_action('manage_ec_product_posts_custom_column', [$this, 'renderColumn'], 10, 2);
+    }
+
+    public function addTitle($columns)
+    {
+        unset($columns['date']);
+        $columns['modified'] = __( 'Last Modified' );
+        return $columns;
+    }
+
+    public function renderColumn($column, $post_id)
     {
         switch ( $column ) {
             case 'modified':

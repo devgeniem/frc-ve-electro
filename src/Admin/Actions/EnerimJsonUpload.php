@@ -4,6 +4,11 @@ namespace VE\Electro\Admin\Actions;
 
 class EnerimJsonUpload
 {
+    public function register()
+    {
+        add_action('admin_post_enerim_json_upload', [$this, 'handle']);
+    }
+
     public function handle()
     {
         check_admin_referer('enerim_json_upload');
@@ -17,12 +22,16 @@ class EnerimJsonUpload
             $data = json_decode($data, true);
         }
 
+        if (is_array($data) && ! empty($data['product_name']) ) {
+            $data = [$data];
+        }
+
         if(empty($data[0]['product_name'])) {
             $data = null;
 
             do_action(
                 'electro/notice/error',
-                'Import failed: file is not valid.',
+                'Import failed: file is not valid.'
             );
         }
 

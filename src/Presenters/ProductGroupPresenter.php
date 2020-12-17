@@ -2,57 +2,21 @@
 
 namespace VE\Electro\Presenters;
 
+use VE\Electro\ProductGroup\ProductGroup;
+
 class ProductGroupPresenter extends Presenter
 {
-    protected function products()
+    protected $group;
+
+    public function __construct(ProductGroup $group)
     {
-        $products = $this->entity->products;
-        return $products
-            ->sortBy(function($entity) {
-                return $entity->getProductName();
-            })
-            ->map(function($entity) {
-                return $entity->present();
-            });
+        $this->group = $group;
     }
 
-    protected function periods()
+    public function data(): array
     {
-        return $this->entity->periods();
-    }
-
-    protected function price_period()
-    {
-        return $this->products->first()->price_period;
-    }
-
-    protected function hasRelatedPeriodGroup()
-    {
-        $period = $this->entity->getRelatedPeriodGroup();
-        if (! $period) {
-            return;
-        }
-
-        $comp = $period->products->first()->components();
-        if (! $comp) {
-            return;
-        }
-
-        return (bool) $comp->all();
-    }
-
-    protected function relatedPeriodGroup()
-    {
-        return $this->entity->getRelatedPeriodGroup();
-    }
-
-    public function isType($type)
-    {
-        return $this->entity->isType($type);
-    }
-
-    public function getType()
-    {
-        return $this->entity->getType();
+        return collect([
+            'products' => $this->group->products()->map->present(),
+        ])->toArray();
     }
 }

@@ -1,46 +1,78 @@
 <?php
+
 namespace VE\Electro\Admin\Acf;
 
 class ProductGroupFields extends Field
 {
     public function register()
     {
-
         $field_products = [
             'key' => $this->field('ec_products'),
             'name' => 'ec_products',
+            'label' => _x('Products', 'acf', 'electro'),
+            'type' => 'repeater',
+            'layout' => 'block',
+            'sub_fields' => [
+                [
+                    'key' => $this->field('ec_product'),
+                    'name' => 'ec_product',
 
-            'label' => 'Products',
-            'type' => 'post_object',
-            'post_type' => 'ec_product',
-            'multiple' => true,
-            'return_format' => 'id',
-        ];
+                    'label' => _x('Product', 'acf', 'electro'),
+                    'type' => 'post_object',
+                    'post_type' => 'ec_product',
+                    'multiple' => false,
+                    'return_format' => 'id',
+                ],
+                [
+                    'key' => $this->field('consumption_min'),
+                    'name' => 'consumption_min',
+                    'label' => _x('Consumption Min', 'acf', 'electro'),
+                    'type' => 'number',
+                    'append' => 'kwh',
+                    'wrapper' => [
+                        'width' => '50%',
+                    ],
+                ],
+                [
+                    'key' => $this->field('consumption_max'),
+                    'name' => 'consumption_max',
+                    'label' => _x('Consumption Max', 'acf', 'electro'),
+                    'type' => 'number',
+                    'append' => 'kwh',
+                    'wrapper' => [
+                        'width' => '50%',
+                    ],
+                ],
+                [
+                    'key' => $this->field('product_key'),
+                    'name' => 'product_key',
+                    'label' => _x('Custom key', 'acf', 'electro'),
+                    'type' => 'text',
 
-        $field_title = [
-            'key' => $this->field('title'),
-            'name' => 'title',
-
-            'label' => 'Title',
-            'type' => 'text',
+                    'wrapper' => [
+                        'width' => '50%',
+                    ],
+                ],
+                [
+                    'key' => $this->field('product_value'),
+                    'name' => 'product_value',
+                    'label' => _x('Custom value', 'acf', 'electro'),
+                    'type' => 'text',
+                    'wrapper' => [
+                        'width' => '50%',
+                    ],
+                ],
+            ],
             'wrapper' => [
                 'width' => '50%',
             ],
         ];
 
-        $field_related_page = [
-            'key' => $this->field('related_page'),
-            'name' => 'related_page',
+        $field_icon = [
+            'key' => $this->field('icon'),
+            'name' => 'icon',
 
-            'label' => 'Marketing page',
-            'type' => 'link',
-        ];
-
-        $field_logo = [
-            'key' => $this->field('logo'),
-            'name' => 'logo',
-
-            'label' => 'Logo',
+            'label' => _x('Icon', 'acf', 'electro'),
             'type' => 'image',
             'return_format' => 'id',
             'wrapper' => [
@@ -48,56 +80,38 @@ class ProductGroupFields extends Field
             ],
         ];
 
-        $field_short_title = [
-            'key' => $this->field('title_short'),
-            'name' => 'title_short',
-
-            'label' => 'Short Title',
-            'type' => 'text',
-        ];
-
         $field_description = [
             'key' => $this->field('description'),
             'name' => 'description',
 
-            'label' => 'Description',
-            'type' => 'textarea',
+            'label' => _x('Description', 'acf', 'electro'),
+            'type' => 'wysiwyg',
             'wrapper' => [
                 'width' => '50%',
             ],
-        ];
-
-        $field_short_description = [
-            'key' => $this->field('description_short'),
-            'name' => 'description_short',
-
-            'label' => 'Short description',
-            'type' => 'textarea',
-            'wrapper' => [
-                'width' => '50%',
-            ],
+            'media_upload' => false,
         ];
 
         $field_additional_description = [
             'key' => $this->field('additional_description'),
             'name' => 'additional_description',
 
-            'label' => 'Additional description',
-            'type' => 'textarea',
+            'label' => _x('Additional description', 'acf', 'electro'),
+            'type' => 'wysiwyg',
             'wrapper' => [
                 'width' => '50%',
             ],
         ];
 
-        $field_short_additional_description = [
-            'key' => $this->field('additional_description_short'),
-            'name' => 'additional_description_short',
+        $field_additional_products = [
+            'key' => $this->field('additional_products'),
+            'name' => 'additional_products',
 
-            'label' => 'Short additional description',
-            'type' => 'textarea',
-            'wrapper' => [
-                'width' => '50%',
-            ],
+            'label' => _x('Additional products', 'acf', 'electro'),
+            'type' => 'post_object',
+            'post_type' => 'product_additional',
+            'multiple' => true,
+            'return_format' => 'id',
         ];
 
         $location = [
@@ -107,17 +121,13 @@ class ProductGroupFields extends Field
         ];
         $group = [
             'key' => $this->group('product_group'),
-            'title' => 'Product Group',
+            'title' => _x('Product Group', 'acf', 'electro'),
             'fields' => [
                 $field_products,
-                $field_title,
-                $field_logo,
-                $field_short_title,
+                $field_icon,
                 $field_description,
                 $field_additional_description,
-                $field_short_description,
-                $field_short_additional_description,
-                $field_related_page,
+                $field_additional_products,
             ],
             'location' => [
                 [

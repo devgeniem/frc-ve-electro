@@ -10,6 +10,7 @@ class Products
     public $action = 'electro/products';
 
     protected $api;
+
     protected $repository;
 
     public function __construct()

@@ -2,8 +2,6 @@
 
 namespace VE\Electro\EnerimCIS\Http\Middleware;
 
-use Exception;
-
 class Auth
 {
     protected $key;
@@ -20,10 +18,6 @@ class Auth
 
     public function handle($handle)
     {
-        if (! $this->key || ! $this->cert) {
-            throw new Exception('EnerimCIS API auth key or cert is missing.');
-        }
-
         curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, 0);
 
@@ -50,6 +44,7 @@ class Auth
         $resource = fopen($path, 'w');
         $content = str_replace('\n', "\n", $content);
         fwrite($resource, $content);
+        fclose($resource);
 
         $this->tempFiles[] = $path;
 

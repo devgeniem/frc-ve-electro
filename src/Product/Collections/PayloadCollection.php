@@ -2,9 +2,9 @@
 
 namespace VE\Electro\Product\Collections;
 
-use Carbon\Carbon;
-use VE\Electro\EnerimCIS\Code;
-use VE\Electro\Support\Collection as BaseCollection;
+use Carbon\CarbonImmutable;
+use VE\Electro\EnerimCIS\Enums\Code;
+use Tightenco\Collect\Support\Collection as BaseCollection;
 
 class PayloadCollection extends BaseCollection
 {
@@ -18,11 +18,8 @@ class PayloadCollection extends BaseCollection
         $value = parent::get($key, $default);
 
         // Cast dates to Carbon object
-        if ( in_array($key, $this->dates) ) {
-            return Carbon::create($value)
-                ->settings([
-                    'toStringFormat' => 'j.n.Y',
-                ]);
+        if ($value && in_array($key, $this->dates) ) {
+            return CarbonImmutable::parse($value);
         }
 
         // Mutate Enerim API codes automatically

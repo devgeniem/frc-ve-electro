@@ -2,45 +2,54 @@
 
 namespace VE\Electro\Presenters;
 
-abstract class Presenter {
+use ArrayAccess;
+use ArrayIterator;
+use IteratorAggregate;
+use VE\Electro\Electro;
 
-    /**
-    * @var mixed
-    */
-    protected $entity;
+abstract class Presenter implements IteratorAggregate, ArrayAccess
+{
+    protected $items;
 
-    protected $hash;
+    abstract public function data(): array;
 
-    /**
-    * @param $entity
-    */
-    function __construct($entity)
+    protected function language()
     {
-        $this->entity = $entity;
+        return Electro::langId();
     }
 
-    public function hash()
+    protected function translate($key)
     {
-        if (! $this->hash) {
-            $this->hash = uniqid();
-        }
-
-        return $this->hash;
+        return Electro::translate($key);
     }
 
-    /**
-    * Allow for property-style retrieval
-    *
-    * @param $property
-    * @return mixed
-    */
-    public function __get($property)
+    public function toArray()
     {
-        if (method_exists($this, $property))
-        {
-            return $this->{$property}();
-        }
+        return $this->items ?? $this->items = $this->data();
+    }
 
-        return $this->entity->{$property};
+    public function offsetExists($key)
+    {
+        return array_key_exists($key, $this->toArray());
+    }
+
+    public function offsetGet($key)
+    {
+        if ($this->offsetExists($key)) {
+            return $this->toArray()[$key];
+        }
+    }
+
+    public function offsetSet($key, $value)
+    {
+    }
+
+    public function offsetUnset($key)
+    {
+    }
+
+    public function getIterator()
+    {
+        return new ArrayIterator($this->toArray());
     }
 }

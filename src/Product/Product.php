@@ -2,122 +2,43 @@
 
 namespace VE\Electro\Product;
 
-use VE\Electro\Electro;
-use VE\Electro\Support\Str;
-use VE\Electro\Presenters;
+use VE\Electro\Presenters\ProductPresenter;
+use VE\Electro\Presenters\Traits\HasPresenter;
 use VE\Electro\Product\Collections\PayloadCollection;
-use VE\Electro\Product\Collections\ComponentCollection;
 
-class Product
+abstract class Product
 {
+    use Traits\HasMeta;
+    use Traits\HasComponents;
+    use Traits\HasPeriodFilters;
+    use Traits\HasAdditionalProducts;
+
+    use HasPresenter;
+    protected $presenter = ProductPresenter::class;
+
     protected $payload;
-    protected $context;
-    protected $filters = [];
 
-    public function __construct($model, $context)
+    protected $type;
+
+    protected $canHavePriceEstimation = false;
+
+    protected $hasRelatedPeriodGroup = false;
+
+    protected $displayContractPeriod = false;
+
+    public function __construct($payload)
     {
-        $this->payload = (new PayloadCollection($model->payload))->recursive();
-        $this->components = $this->payload()
-            ->get('product_components');
-
-        $this->context = $context;
+        $this->payload = PayloadCollection::make($payload)->recursive();
     }
 
-    public function payload()
+    public function id()
     {
-        return $this->payload;
+        return $this->payload->get('product_name');
     }
 
-    public function getAllComponents()
+    public function type()
     {
-        $components = (new ComponentCollection($this->components))
-            ->mapInto(ProductComponent::class);
-
-        return $this->context->components($components);
-    }
-
-    public function components()
-    {
-        $comps = $this->getAllComponents();
-
-        foreach($this->filters as $method => $key) {
-            $comps = $comps->$method($key, $this->context);
-        }
-
-        return $comps;
-    }
-
-    public function filter($filters)
-    {
-        $this->filters = $filters;
-        return $this;
-    }
-
-    public function getMeta()
-    {
-        return $this->context->meta();
-    }
-
-    public function getRelatedPeriodGroup()
-    {
-        return 'sf';
-    }
-
-    public function getType()
-    {
-        return $this->context->getType();
-    }
-
-    public function isType($type)
-    {
-        return $this->getType() == $type;
-    }
-
-    public function getCustomerType() {
-        return $this->getDynamicPropertyValue('CustomerType')->first();
-    }
-
-    // @todo: clean this
-    public function isCompany() {
-        return $this->getCustomerType() == 'Yritys / organisaatio';
-    }
-
-    public function isCustomer() {
-        return !$this->isCompany();
-    }
-
-    public function get($key)
-    {
-        return $this->payload()->get($key);
-    }
-
-    public function getDescription()
-    {
-        return $this->get('product_descriptions')
-            ->where('language', Electro::langId()) // TODO
-            ->first()
-            ->get('description');
-    }
-
-    public function getContractType()
-    {
-        return $this->get('contract_validity');
-    }
-
-    public function getContractDuration()
-    {
-        $duration = $this->get('contract_validity_duration');
-        $durationUnit = $this->get('contract_validity_duration_unit');
-        $type = $this->getContractType();
-
-        $durationUnit = Electro::translate($durationUnit);
-        $type = Electro::translate($type);
-
-        if ( $duration ) {
-            return $type . ' ' . $duration . ' ' . $durationUnit;
-        }
-
-        return $type;
+        return $this->type;
     }
 
     public function getDynamicPropertyValue($key)
@@ -142,93 +63,66 @@ class Product
         return intval($value);
     }
 
-    public function getMeasurementMethodName()
+    public function getContractType()
     {
-        $key = $this->getMeasurementMethodId();
-
-        $titles = [
-            '1' => Electro::translate('common'),
-            '2' => Electro::translate('time'),
-            '3' => Electro::translate('season')
-        ];
-
-        return $titles[$key];
+        return $this->payload->get('contract_validity');
     }
 
-    public function getSubtitle() {
-        $key = $this->getMeasurementMethodId();
-
-        $titles = [
-            '1' => Electro::translate('all_households'),
-            '2' => Electro::translate('electric_heating'),
-            '3' => Electro::translate('electric_heating')
-        ];
-
-        if ($this->isCompany()) {
-            return '';
-        }
-
-        return $titles[$key];
-    }
-
-    public function getOrderLink()
+    public function contractDuration()
     {
-        $base_uri = getenv('SOPA_BASE_URL') ?: 'https://193.208.127.194:83';
-        $path = '/NewContract/Contract/EndProcess';
-        $args = array_filter([
-            'selectedProductCode' => $this->getProductName(),
-            'campaignCode' => $this->getCampaignCode(),
-            'culture' => Electro::getLocale(),
-            'brand' => $this->isBonusProduct() ? 'SBonus' : '',
-        ]);
-
-        return add_query_arg($args, $base_uri . $path);
+        return $this->getContractType();
     }
 
-    public function getCampaignCode()
+    public function displayContractPeriod()
+    {
+        return $this->displayContractPeriod;
+    }
+
+    protected function hasRelatedPeriodGroup()
+    {
+        return $this->hasRelatedPeriodGroup;
+    }
+
+    public function canHavePriceEstimation()
+    {
+        return $this->canHavePriceEstimation;
+    }
+
+    public function isBonusProduct()
+    {
+        return $this->payload->get('bonus_product');
+    }
+
+    public function title($lang = true)
+    {
+        return $this->payload->get('product_descriptions')
+            ->where('language', $lang)
+            ->first()
+            ->get('description');
+    }
+
+    public function customerType()
+    {
+        return $this->getDynamicPropertyValue('CustomerType')->first();
+    }
+
+    public function isCustomerType($type)
+    {
+        return $this->customerType() == $type;
+    }
+
+    public function isForConsumers()
+    {
+        return $this->isCustomerType('Henkilö');
+    }
+
+    public function isForBusiness()
+    {
+        return $this->isCustomerType('Yritys / organisaatio');
+    }
+
+    public function campaignCode()
     {
         return $this->getDynamicPropertyValue('CampaignCode')->first();
     }
-
-    public function isActive()
-    {
-        $first =  $this->components()->first();
-        if ($first) {
-            return $first->isActive();
-        }
-
-    }
-
-    public function hasRelatedPeriodGroup()
-    {
-        return $this->context->hasRelatedPeriodGroup();
-    }
-
-    public function present() {
-        return new Presenters\ProductPresenter($this);
-    }
-
-    public function __call($method, $parameters)
-    {
-        if (Str::startsWith($method, 'get')) {
-            $key = Str::replaceFirst('get', '', $method);
-            $key = Str::snake($key);
-
-            if ($withProductPrefix = $this->get("product_$key")) {
-                return $withProductPrefix;
-            }
-
-            return $this->get($key);
-        }
-
-        if (Str::startsWith($method, 'is')) {
-            $key = Str::replaceFirst('is', '', $method);
-            $key = Str::snake($key);
-
-            return (bool) $this->get($key);
-        }
-
-
-    }
-
 }

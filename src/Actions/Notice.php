@@ -42,19 +42,23 @@ class Notice
         delete_user_option($userId, $this->action);
     }
 
-    public function info($message) {
+    public function info($message)
+    {
         $this->add($message, 'info');
     }
 
-    public function error($message) {
+    public function error($message)
+    {
         $this->add($message, 'error');
     }
 
-    public function warning($message) {
+    public function warning($message)
+    {
         $this->add($message, 'warning');
     }
 
-    public function success($message) {
+    public function success($message)
+    {
         $this->add($message, 'success');
     }
 }

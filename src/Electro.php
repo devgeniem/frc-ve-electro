@@ -2,7 +2,7 @@
 
 namespace VE\Electro;
 
-use VE\Electro\EnerimCIS\Code;
+use VE\Electro\EnerimCIS\Enums\Code;
 
 class Electro
 {
@@ -28,10 +28,15 @@ class Electro
         $locale = static::getLocale();
 
         $translations = [
-            'month' => [
+            'UNIT.MONTH' => [
                 'fi' => 'kk',
                 'en' => 'month',
                 'sv' => 'mån',
+            ],
+            'UNIT.KWH' => [
+                'fi' => 'kWh',
+                'en' => 'kWh',
+                'sv' => 'kWh',
             ],
             'temporary' => [
                 'fi' => 'määräaikainen',
@@ -39,24 +44,24 @@ class Electro
                 'sv' => 'visstids',
             ],
             'permanent' => [
-                'fi' => 'toistaiseksi',
+                'fi' => 'voimassa toistaiseksi',
                 'en' => 'until further notice',
                 'sv' => 'tillsvidare',
             ],
-            'common' => [
-                'fi' => 'yleissähkö',
-                'en' => 'common',
-                'sv' => 'allmän el',
+            'METERING.COMMON' => [
+                'fi' => 'Yleissähkö',
+                'en' => 'Common',
+                'sv' => 'Allmän el',
             ],
-            'time' => [
-                'fi' => 'aikasähkö',
-                'en' => 'time',
-                'sv' => 'tidsel',
+            'METERING.TIME' => [
+                'fi' => 'Aikasähkö',
+                'en' => 'Time',
+                'sv' => 'Tidsel',
             ],
-            'season' => [
-                'fi' => 'kausisähkö',
-                'en' => 'season',
-                'sv' => 'säsongel',
+            'METERING.SEASON' => [
+                'fi' => 'Kausisähkö',
+                'en' => 'Season',
+                'sv' => 'Säsongel',
             ],
             'order' => [
                 'fi' => 'Tilaa',
@@ -93,8 +98,8 @@ class Electro
                 'en' => 'Show prices with VAT (24 %)',
                 'sv' => 'Visa priser med moms (24 %)',
             ],
-            'spot' => [
-                'fi' => '+  Vaihtuva Spot-hinta',
+            'COMPONENTS.SPOT.META' => [
+                'fi' => '+  Vaihtuva Spot-tuntihinta',
                 'en' => '+ Spot price',
                 'sv' => '+ Spot priset',
             ],
@@ -103,36 +108,51 @@ class Electro
                 'en' => 'from %s',
                 'sv' => 'från %s',
             ],
-            'energy' => [
+            'CONSUMPTION.COMMON' => [
                 'fi' => 'Energia',
                 'en' => 'Energy',
                 'sv' => 'Energi',
             ],
-            'day_energy' => [
+            'CONSUMPTION.TIME_DAY' => [
                 'fi' => 'Päiväenergia',
                 'en' => 'Day Energy',
                 'sv' => 'Dag energi',
             ],
-            'night_energy' => [
+            'CONSUMPTION.TIME_NIGHT' => [
                 'fi' => 'Yöenergia',
                 'en' => 'Night Energy',
                 'sv' => 'Natt energi',
             ],
-            'winter_day_energy' => [
+            'CONSUMPTION.SEASON_WINTER' => [
                 'fi' => 'Talvipäiväenergia',
                 'en' => 'Winter day energy',
                 'sv' => 'Vinterdag energi',
             ],
-            'other_time_energy' => [
+            'CONSUMPTION.SEASON_OTHER' => [
                 'fi' => 'Muun ajan energia',
                 'en' => 'Other Time energy',
                 'sv' => 'Annan tidsenergi',
             ],
-            'count' => [
-                'fi' => 'Laske',
-                'en' => 'Count',
-                'sv' => 'Räkna',
-            ]
+            'HOUSE_TYPE.APARTMENT' => [
+                'fi' => 'Kerrostalo',
+                'en' => 'Apartment',
+                'sv' => 'Flervaningshus',
+            ],
+            'HOUSE_TYPE.ROW_HOUSE' => [
+                'fi' => 'Pari- tai rivitalo',
+                'en' => 'Row house',
+                'sv' => 'Radhus',
+            ],
+            'HOUSE_TYPE.TOWN_HOUSE' => [
+                'fi' => 'Omakotitalo',
+                'en' => 'Town house',
+                'sv' => 'Enfamiljshus',
+            ],
+            'HOUSE_TYPE.OTHER' => [
+                'fi' => 'Muu asunto',
+                'en' => 'Other house',
+                'sv' => 'Annan hus',
+            ],
         ];
 
         return $translations[$key][$locale] ?? $key;
@@ -140,7 +160,7 @@ class Electro
 
     public static function sopaLink($args = [])
     {
-        $base_uri = getenv('SOPA_BASE_URL') ?: 'https://193.208.127.194:83';
+        $base_uri = getenv('SOPA_BASE_URL') ?: 'https://online.oomi.fi';
         $path = '/NewContract/Contract/EndProcess';
         $args = array_filter($args);
 

@@ -1,4 +1,5 @@
 <?php
+
 namespace VE\Electro\Admin\Acf;
 
 abstract class Field
@@ -15,8 +16,10 @@ abstract class Field
 
     protected function key($prefix, $value)
     {
+        $id = static::class;
         $prefix = "{$prefix}_";
-        $value = md5("ve_electro_$value");
+        $value = md5("ve_electro_{$id}_{$value}");
+
         return sprintf('%s%s', $prefix, $value);
     }
 }

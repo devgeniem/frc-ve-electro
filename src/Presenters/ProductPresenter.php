@@ -2,127 +2,220 @@
 
 namespace VE\Electro\Presenters;
 
-use VE\Electro\Support\Str;
-use VE\Electro\Electro;
+use VE\Electro\Product\Enums\ComponentType;
+use VE\Electro\Product\Enums\PricePeriodType;
+use VE\Electro\Product\Product;
+use VE\Electro\Product\ProductPrice;
+use VE\Electro\Product\ProductComponent;
 
 class ProductPresenter extends Presenter
 {
-    public function title()
+    protected $product;
+
+    public function __construct(Product $product)
     {
-        $title = $this->entity->getMeasurementMethodName();
-        return Str::ucfirst($title);
+        $this->product = $product;
     }
 
-    public function measurementMethodId() {
-        return $this->entity->getMeasurementMethodId();
-    }
-
-    public function subtitle()
+    public function data(): array
     {
-        $subtitle = $this->entity->getSubtitle();
-        if (env('WP_ENV') == 'production') {
-            return $subtitle;
-        }
-
-        return $subtitle . ' (' . $this->name . ')';
+        return $this->product()->toArray();
     }
 
-    public function name()
+    protected function product()
     {
-        return $this->entity->getProductName();
+        $product = $this->product;
+
+        $components = $this->components($product);
+
+        $periods = collect([PricePeriodType::ACTIVE, PricePeriodType::RELATED])
+            ->mapWithKeys(function($period) use ($components) {
+                $string = $this->getPeriodString($components, $period);
+
+                if (! $string) {
+                    return [];
+                }
+
+                $primaryComponents = $components->where('type', ComponentType::PRIMARY);
+                $secondaryComponents = $components->where('type', ComponentType::SECONDARY);
+
+                return [
+                    $period => collect([
+                        'period' => $string,
+                        'periodKey' => $this->getPeriodKey($components, $period),
+                        'components' => [
+                            'primary' => $this->filterPeriod($primaryComponents, $period),
+                            'secondary' => $this->filterPeriod($secondaryComponents, $period),
+                        ],
+                    ]),
+                ];
+        });
+
+        return collect([
+            'id' => $product->id(),
+            'title' => $product->title($this->language()),
+            'data' => collect([
+                'id' => $product->id(),
+                'conditions' => collect([
+                    'consumptionMax' => $product->meta('consumption_max'),
+                    'consumptionMin' => $product->meta('consumption_min'),
+                ])->filter(),
+                'metering' => $product->getMeasurementMethodId(),
+                'type' => $product->type(),
+                'prices' => $this->priceValues($components),
+                'key' => $product->meta('product_key') ?? 'productCode',
+                'value' => $product->meta('product_value') ?? $product->id(),
+                'additionalProducts' => $product->type() !== 'additional' && $product->additionalProducts()
+                    ? $product->additionalProducts()->map->id()
+                    : [],
+                'campaignCode' => $product->campaignCode(),
+            ])->filter(),
+            'meta' => [
+                'description' => $product->meta('description'),
+                'additional_description' => $product->meta('additional_description'),
+                'icon' => $product->meta('icon'),
+            ],
+            'type' => $product->type(),
+            'contractDuration' => $this->translate($product->contractDuration()),
+            'displayContractPeriod' => $product->displayContractPeriod(),
+            'canHavePriceEstimation' => $product->canHavePriceEstimation(),
+            'customerType' => $product->customerType(),
+            'periods' => $periods,
+            'hasDiscount' => $this->hasDiscount($components) || $product->campaignCode(),
+        ])->pipe(function($collection) {
+            return $collection->merge([
+                'hasRelatedPeriodGroup' => (bool) $collection
+                    ->get('periods')->get(PricePeriodType::RELATED),
+            ]);
+        });
     }
 
-    public function description() {
-        return $this->entity->getDescription();
-    }
-
-    // @todo: hack
-    public function getPacketSubtitle() {
-        if (strpos($this->description(), ' S') !== false ) {
-            return '<2000 kWh/v';
-        } else if (strpos($this->description(), ' M') !== false ) {
-            return '2000-3000 kWh/v';
-        }else if (strpos($this->description(), ' L') !== false ) {
-            return '3000-4000 kWh/v';
-        }
-    }
-
-
-    public function components()
+    protected function components(Product $product)
     {
-        return (object) [
-            'primary' => $this->entity->components()->type('primary'),
-            'secondary' => $this->entity->components()->type('secondary'),
-        ];
+        return $product->components()
+            ->map(function(ProductComponent $component) use ($product) {
+                return $this->formatComponent($component, $product);
+            })->filter(function($component) {
+                return ! $component->get('prices')->isEmpty();
+            })->sortBy('order');
     }
 
-    public function contract_duration()
-    {
-        return Electro::translate('contract_duration') . ': ' . $this->entity->getContractDuration();
+    protected function formatComponent(
+        ProductComponent $component,
+        Product $product
+    ) {
+        return collect([
+            'id' => $component->id(),
+            'order' => $component->sortOrder(),
+            'key' => $component->calculationKey(),
+            'type' => $component->type(),
+            'description' => $component->description($this->language()),
+            'feeType' => $component->feeType(),
+            'meta' => $this->translate($component->meta()),
+            'prices' => $component->prices()
+                ->map(function(ProductPrice $price) use ($product) {
+                    return $this->formatPrice($price, $product);
+                })
+        ]);
     }
 
-    public function price_period()
+    protected function formatPrice(ProductPrice $price, Product $product)
     {
-        $main = $this->entity->components()->first();
-        if (! $main) {
+        $price = $product->isForBusiness()
+            ? $price->withoutVat()
+            : $price->withVat();
+
+        return collect([
+            'value' => $price->value(),
+            'amount' => $price->amount(),
+            'unit' => $price->unit(),
+            'hasVat' => $price->hasVat(),
+            'hasDiscount' => $price->hasDiscount(),
+            'isDiscount' => $price->isDiscount(),
+            'campaign' => $price->campaign(),
+            'validFrom' => $price->validFrom(),
+            'validTo' => $price->validTo(),
+            'period' => $price->period(),
+            'periodKey' => $price->periodKey(),
+        ]);
+    }
+
+    protected function priceValues($components)
+    {
+        return $this->filterPeriod($components, PricePeriodType::ACTIVE)
+            ->map(function($component) {
+                return collect([
+                    'key' => $component->get('key'),
+                    'value' => $component->get('prices')
+                        ->where('hasDiscount', false)
+                        ->where('isDiscount', false)
+                        ->first(null, collect([]))
+                        ->get('value', 0),
+                ]);
+            })->values();
+    }
+
+    /**
+     * Helpers
+     */
+
+    protected function filterPeriod($components, $type)
+    {
+        return $components
+            ->map(function($component) use ($type) {
+                $prices = $component->get('prices')->where('period', $type);
+                return $component->replace(['prices' => $prices]);
+            });
+    }
+
+    protected function getPeriodString($components, $period)
+    {
+        $activePeriod = $this->filterPeriod($components, $period)
+            ->first();
+
+        if (! $activePeriod) {
             return;
         }
-        $from = $main->get('valid_from')->setTimezone('Europe/Helsinki')->format('j.n.');
-        $to = $main->get('valid_to')->setTimezone('Europe/Helsinki')->subDay()->format('j.n.Y');
-        return Electro::translate('price_period') . ": {$from}-{$to}";
-    }
 
-    public function price_period_from()
-    {
-        $main = $this->entity->components()->first();
-        if (! $main) {
+        $activePeriod = $activePeriod->get('prices')
+            ->first();
+
+        if (! $activePeriod) {
             return;
         }
-        $from = $main->get('valid_from')->setTimezone('Europe/Helsinki')->format('j.n.Y');
-        return Electro::translate('price_period') . ": " . sprintf(Electro::translate('from'), $from);
+
+        return sprintf(
+            '%s - %s',
+            $activePeriod['validFrom']->setTimezone('Europe/Helsinki')->format('j.n.'),
+            $activePeriod['validTo']->setTimezone('Europe/Helsinki')->format('j.n.Y')
+        );
     }
 
-    public function meta()
+    protected function getPeriodKey($components, $period)
     {
-        $keys = $this->entity->getMeta();
-        return array_map(function($key) {
-            return $this->$key;
-        }, $keys);
+        $activePeriod = $this->filterPeriod($components, $period)
+            ->first()
+            ->get('prices')
+            ->first();
+
+        if (! $activePeriod) {
+            return;
+        }
+
+        return $activePeriod['periodKey'];
     }
 
-    public function isOrderable()
+    protected function hasDiscount($components)
     {
-        return $this->entity->isActive();
-    }
+        $items = $this->filterPeriod($components, PricePeriodType::ACTIVE);
 
-    public function order_link()
-    {
-        return $this->entity->getOrderLink();
-    }
-
-    public function order_text()
-    {
-        return Electro::translate('order');
-    }
-
-    public function isType($type) {
-        return $this->entity->isType($type);
-    }
-
-    public function hasComponents()
-    {
-        return (bool) $this->entity->components();
-    }
-
-    public function getCustomerType() {
-        return $this->entity->getCustomerType();
-    }
-
-    public function isCompany() {
-        return $this->entity->isCompany();
-    }
-
-    public function getType() {
-        return $this->entity->getType();
+        return $items
+                ->pluck('prices.*.hasDiscount')
+                ->flatten()
+                ->filter()
+                ->isNotEmpty()
+            || $items
+                ->where('hasDiscount')
+                ->isNotEmpty();
     }
 }

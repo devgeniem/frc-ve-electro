@@ -20,6 +20,15 @@
     "require": {
         "php": ">=7.3",
         "composer/installers": "~1.0",
-        "nesbot/carbon": "^2.24"
+        "nesbot/carbon": "^2.24",
+        "tightenco/collect": "^6.15"
+    },
+    "autoload": {
+        "psr-4": {
+            "VE\\Electro\\": "src/"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
     }
 }

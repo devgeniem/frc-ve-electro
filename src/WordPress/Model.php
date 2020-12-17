@@ -4,16 +4,16 @@ namespace VE\Electro\WordPress;
 
 use VE\Electro\Support\Str;
 
-class Model
+abstract class Model
 {
-    use Concerns\HasRelations;
+    use Traits\HasRelations;
+    use Traits\HasMeta;
 
     protected static $instances = [];
 
-    protected $attributes = [];
-    protected $wp_attributes = [];
+    protected $translatable = false;
 
-    protected $fillable = [];
+    protected $attributes = [];
 
     protected $exists = false;
 
@@ -32,67 +32,16 @@ class Model
     public function fill(array $attributes)
     {
         foreach($attributes as $key => $value) {
-            if ($this->isFillable($key)) {
+            if ($this->isWpAttribute($key)) {
                 $this->setAttribute($key, $value);
-            }
-            // $key = Str::lower($key);
-            if ( in_array($key, $this->wp_attributes()) ) {
-                $this->wp_attributes[$key] = $value;
             }
         }
 
         return $this;
     }
 
-    public function isFillable($key)
-    {
-        if (in_array($key, $this->getFillable())) {
-            return true;
-        }
-
-        return empty($this->getFillable()) &&
-            ! Str::startsWith($key, '_');
-    }
-
-    public function getFillable()
-    {
-        return $this->fillable;
-    }
-
     public function setAttribute($key, $value) {
-        if ($this->hasSetMutator($key)) {
-            return $this->setMutatedAttributeValue($key, $value);
-        }
-
         $this->attributes[$key] = $value;
-    }
-
-    protected function setMutatedAttributeValue($key, $value)
-    {
-        return $this->{'set'.Str::studly($key).'Attribute'}($value);
-    }
-
-    public function hasSetMutator($key)
-    {
-        return method_exists($this, 'set'.Str::studly($key).'Attribute');
-    }
-
-    protected function setMetaAttribute($values)
-    {
-        foreach($values as $key => $value) {
-            $value = maybe_unserialize($value[0]);
-            $this->setAttribute($key, $value);
-        }
-    }
-
-    public function hasGetMutator($key)
-    {
-        return method_exists($this, 'get'.Str::studly($key).'Attribute');
-    }
-
-    protected function mutateAttribute($key, $value)
-    {
-        return $this->{'get'.Str::studly($key).'Attribute'}($value);
     }
 
     public function getAttributes()
@@ -106,8 +55,7 @@ class Model
             return;
         }
 
-        if (array_key_exists($key, $this->attributes) ||
-            $this->hasGetMutator($key)) {
+        if (array_key_exists($key, $this->attributes)) {
             return $this->getAttributeValue($key);
         }
 
@@ -116,26 +64,12 @@ class Model
 
     public function getAttributeValue($key)
     {
-        $value = $this->getAttributeFromArray($key);
-
-        // If the attribute has a get mutator, we will call that then return what
-        // it returns as the value, which is useful for transforming values on
-        // retrieval from the model to a form that is more useful for usage.
-        if ($this->hasGetMutator($key)) {
-            return $this->mutateAttribute($key, $value);
-        }
-
-        return $value;
-    }
-
-    protected function getAttributeFromArray($key)
-    {
         return $this->attributes[$key] ?? null;
     }
 
-    public function wp_attributes()
+    public function isWpAttribute($key)
     {
-        return [
+        return in_array($key, [
             'ID',
             'post_author',
             'post_date',
@@ -163,7 +97,7 @@ class Model
             'meta_input',
             'post_mime_type',
             'comment_count',
-        ];
+        ]);
     }
 
     public static function make()
@@ -175,14 +109,32 @@ class Model
         return static::$instances[$class];
     }
 
-    protected function register()
+    public function register()
+    {
+        add_action('init', [$this, 'registerPostType']);
+
+        if ($this->translatable) {
+            add_filter('pll_get_post_types', function($post_types, $is_settings ) {
+                if ( $is_settings ) {
+                    unset( $post_types[$this->post_type] );
+                } else {
+                    $post_types[$this->post_type] = $this->post_type;
+                }
+                return $post_types;
+            }, 10, 2);
+        }
+    }
+
+    public function registerPostType()
     {
         $labels = $this->labels;
+
         $args = [
             'labels' => $labels,
             'show_ui' => $this->show_ui,
             'supports' => $this->supports,
         ];
+
         register_post_type($this->post_type, $args);
     }
 
@@ -190,7 +142,6 @@ class Model
      * Query models by using WP_Query
      *
      * @param array $args
-     * @return VE\Electro\Support\Collection
      */
     protected function query(array $args = [])
     {
@@ -230,16 +181,12 @@ class Model
         ];
 
         foreach($attrs as $key => $value) {
-            if ( in_array($key, $this->wp_attributes()) ) {
+            if ($this->isWpAttribute($key)) {
                 $postArray[$key] = $value;
             }
         }
 
-        foreach($this->meta as $key => $value) {
-            $postArray['meta_input'][$key] = $value;
-        }
-
-        if ( $this->exists ) {
+        if ($this->exists) {
             unset($postArray['post_modified']);
             unset($postArray['post_modified_gmt']);
             return wp_update_post($postArray, true);
@@ -278,11 +225,12 @@ class Model
 
         $model = static::query($attributesQuery)->first();
 
-        if ( $model && $model->exists ) {
+        if ($model && $model->exists) {
             return $model->update($attributes);
         }
 
         $model = new static($attributes);
+
         return $model->save();
     }
 
@@ -295,13 +243,18 @@ class Model
         $key = Str::replaceFirst('get', '', $method);
         $key = Str::snake($key);
 
-        if ( in_array($key, $this->wp_attributes()) ) {
+        if ($this->isWpAttribute($key)) {
             return $this->wp_attributes[$key] ?? null;
         }
 
         throw new \BadMethodCallException(sprintf(
             'Call to undefined method %s::%s()', static::class, $method
         ));
+    }
+
+    protected function postType()
+    {
+        return $this->post_type;
     }
 
     public static function __callStatic($method, $parameters)

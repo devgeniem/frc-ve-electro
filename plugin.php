@@ -11,8 +11,10 @@ Author URI:         https://www.frantic.fi/
 
 namespace VE\Electro;
 
-require_once __DIR__ . '/autoload.php';
+if (! file_exists($composer = __DIR__ . '/vendor/autoload.php')) {
+    return;
+}
 
-require_once __DIR__ . '/src/helpers.php';
+require_once $composer;
 
-add_action('plugins_loaded', [new Plugin, 'boot']);
+add_action('plugins_loaded', [new Plugin, 'bootstrap']);

@@ -1,7 +1,7 @@
 <div class="wrap">
 
     <h1>
-        <?php _e( 'Upload JSON response' ); ?>
+        <?php _e('Upload JSON response', 'electro'); ?>
     </h1>
 
     <div id="poststuff">

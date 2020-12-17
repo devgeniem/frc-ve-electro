@@ -11,20 +11,22 @@ class Client
 {
     protected $baseUrl;
 
-    protected $client;
+    protected $apiKey;
+
+    protected $http;
 
     protected $middlewares = [];
 
-    public function __construct($key, $cert, $proxyUrl)
+    public function __construct($apiKey, $options = [])
     {
-        $this->baseUrl = env('ENERIM_BASE_URL');
+        $this->baseUrl = env('ENERIM_API_BASE_URL');
 
-        $this->client = new WP_Http_Curl();
+        $this->apiKey = $apiKey;
 
-        $this->middlewares[] = new Middleware\Auth($key, $cert);
+        $this->http = new WP_Http_Curl();
 
-        if ($proxyUrl) {
-            $this->middlewares[] = new Middleware\Proxy($proxyUrl);
+        if (isset($options['middlewares']) && is_array($options['middlewares'])) {
+            $this->middlewares = $options['middlewares'];
         }
     }
 
@@ -38,12 +40,15 @@ class Client
      */
     public function request($method, $path, $args = [])
     {
-        $baseUrl = $this->baseUrl;
-
-        if (!$baseUrl) {
-            throw new Exception('EnerimCIS API request failed. Env ENERIM_BASE_URL missing!');
+        if (! $this->baseUrl) {
+            throw new Exception('EnerimCIS API request failed. Env ENERIM_API_BASE_URL missing!');
         }
-        $uri = trailingslashit($baseUrl) . trim($path, '/');
+
+        if (! $this->apiKey) {
+            throw new Exception('EnerimCIS API request failed. Env ENERIM_API_KEY missing!');
+        }
+
+        $uri = trailingslashit($this->baseUrl) . trim($path, '/');
 
         $defaults = [
             'method'      => Str::upper($method),
@@ -54,22 +59,23 @@ class Client
             'headers'     => [
                 'Accept'       => 'application/json',
                 'Content-Type' => 'application/json',
-                'User'         => 'Frantic',
-                'User-Agent'   => ''
+                'User-Agent'   => '',
+                'X-ApiKey'     => $this->apiKey,
             ],
             'body'    => null,
             'cookies' => [],
             'stream' => false,
             'decompress' => true,
-            'filename' => ''
+            'filename' => '',
         ];
+
         $args = wp_parse_args($args, $defaults);
 
         foreach($this->middlewares as $middleware) {
             add_action('http_api_curl', [$middleware, 'handle']);
         }
 
-        $response = $this->client->request($uri, $args);
+        $response = $this->http->request($uri, $args);
 
         foreach($this->middlewares as $middleware) {
             remove_action('http_api_curl', [$middleware, 'handle']);
@@ -83,6 +89,13 @@ class Client
         }
 
         $response = new Response($response);
+
+        if ($response->getStatusCode() !== 200) {
+            $data = $response->toArray();
+            throw new Exception(
+                sprintf('EnerimCIS API request failed (error %s) with response: %s', $response->getStatusCode(), json_encode($data))
+            );
+        }
 
         if (! Str::contains($response->getHeader('content-type'), 'application/json')) {
             throw new Exception('EnerimCIS API request returned a non-JSON result.');

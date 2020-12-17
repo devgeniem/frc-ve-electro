@@ -6,32 +6,51 @@ class Currency
 {
     protected $code;
 
-    public const SYMBOLS = [
-        'EUR' => '€',
-        'cent' => 'c',
-        'SEK' => 'kr',
-        'öre' => 'øre',
+    protected $symbol;
+
+    protected $subunit = false;
+
+    protected const CURRENCIES = [
+        'EUR' => [
+            'symbol' => '€',
+            'subunit' => false,
+        ],
+        'cent' => [
+            'symbol' => 'c',
+            'subunit' => true,
+        ],
+        'SEK' => [
+            'symbol' => 'kr',
+            'subunit' => false,
+        ],
+        'öre' => [
+            'symbol' => 'øre',
+            'subunit' => true,
+        ],
     ];
 
     public function __construct($code)
     {
         $this->code = $code;
+
+        $currencies = static::CURRENCIES;
+
+        if (array_key_exists($code, $currencies)) {
+            $this->symbol = $currencies[$code]['symbol'];
+            $this->subunit = $currencies[$code]['subunit'];
+        } else {
+            $this->symbol = $code;
+        }
+
     }
 
     public function getSymbol()
     {
-        $code = $this->code;
-        $symbols = static::SYMBOLS;
-
-        if ( array_key_exists($code, $symbols) ) {
-            return $symbols[$code];
-        }
-
-        return $code;
+        return $this->symbol;
     }
 
     public function isSubunit()
     {
-        return !in_array($this->code, ['EUR', 'SEK']);
+        return $this->subunit;
     }
 }
